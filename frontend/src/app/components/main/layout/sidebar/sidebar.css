@@ -1,0 +1,60 @@
+#sidebar-wrapper {
+    min-height: 100vh;
+    margin-left: -15rem;
+    transition: margin .25s ease-out;
+    width: 15rem;
+}
+
+#sidebar-wrapper .sidebar-heading {
+    padding: 0.875rem 1.25rem;
+    font-size: 1.2rem;
+}
+
+#sidebar-wrapper .list-group {
+    width: 15rem;
+}
+
+body.sb-sidenav-toggled #sidebar-wrapper {
+    margin-left: 0;
+}
+
+@media (min-width: 768px) {
+    #sidebar-wrapper {
+        margin-left: 0;
+    }
+
+    body.sb-sidenav-toggled #sidebar-wrapper {
+        margin-left: -15rem;
+    }
+}
+
+.list-group-item {
+    font-size: 0.9rem;
+    padding: 0.75rem 1.25rem;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+    color: #003366;
+}
+
+.list-group-item.active {
+    background-color: #e9ecef;
+    color: #003366;
+    border-left: 4px solid #003366;
+    font-weight: 600;
+}
+
+/* Estilos para colapsables */
+.modulo-header:hover,
+.categoria-header:hover {
+    background-color: #f8f9fa;
+}
+
+.transition-icon {
+    transition: transform 0.3s ease;
+}
+
+.rotate-180 {
+    transform: rotate(-90deg);
+}

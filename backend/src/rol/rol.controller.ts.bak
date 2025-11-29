@@ -1,0 +1,62 @@
+// src/rol/rol.controller.ts (VERSIÓN CORREGIDA)
+
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Delete,
+  ValidationPipe, // 💡 Importar para la validación
+  UseGuards, // 💡 Importar UseGuards
+} from '@nestjs/common';
+import { RolService } from './rol.service';
+import { rol as RolModel } from '@prisma/client';
+// 💡 Importar DTOs
+import { CreateRolDto } from './dto/create_rol.dto';
+import { UpdateRolDto } from './dto/update_rol.dto';
+import { AuthGuard } from '@nestjs/passport'; // 💡 Importar AuthGuard
+
+// ❌ Eliminar los tipos manuales CreateRolData y UpdateRolData
+
+@UseGuards(AuthGuard('jwt'))
+@Controller('rol')
+export class RolController {
+  constructor(private readonly rolService: RolService) { } // 1. OBTENER TODOS LOS ROLES ACTIVOS (GET /rol)
+
+  @Get()
+  async findAll() {
+    return this.rolService.findAll();
+  } // 2. OBTENER UN ROL POR ID (GET /rol/1)
+
+  @Get(':id')
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.rolService.findOne(id);
+  } // 3. CREAR UN NUEVO ROL (POST /rol)
+
+  @Post()
+  async create(
+    // 💡 Aplicamos ValidationPipe con el DTO
+    @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+    createRolDto: CreateRolDto,
+  ): Promise<RolModel> {
+    return this.rolService.create(createRolDto);
+  } // 4. ACTUALIZAR UN ROL (PATCH /rol/1)
+
+  @Patch(':id')
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    // 💡 Aplicamos ValidationPipe con el DTO
+    @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+    updateRolDto: UpdateRolDto,
+  ): Promise<RolModel> {
+    return this.rolService.update(id, updateRolDto);
+  } // 5. ELIMINACIÓN LÓGICA (DELETE /rol/1)
+
+  @Delete(':id')
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<RolModel> {
+    return this.rolService.remove(id);
+  }
+}

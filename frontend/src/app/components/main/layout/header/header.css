@@ -1,0 +1,12 @@
+.navbar {
+    height: 70px;
+}
+
+#menu-toggle {
+    background-color: #003366;
+    border: none;
+}
+
+#menu-toggle:hover {
+    background-color: #002244;
+}

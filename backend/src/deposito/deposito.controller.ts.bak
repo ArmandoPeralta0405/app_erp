@@ -1,0 +1,46 @@
+// Backup of original DepositoController
+// src/deposito/deposito.controller.ts
+
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { DepositoService } from './deposito.service';
+import { CreateDepositoDto } from './dto/create_deposito.dto';
+import { UpdateDepositoDto } from './dto/update_deposito.dto';
+import { PermissionsGuard } from '../auth/guards/permissions.guard';
+import { RequirePermission } from '../auth/decorators/require-permission.decorator';
+
+@UseGuards(AuthGuard('jwt'), PermissionsGuard)
+@Controller('deposito')
+export class DepositoController {
+  constructor(private readonly depositoService: DepositoService) { }
+
+  @Post()
+  @RequirePermission('/finanzas/mantenimientos/depositos', 'escritura')
+  create(@Body() createDto: CreateDepositoDto) {
+    return this.depositoService.create(createDto);
+  }
+
+  @Get()
+  @RequirePermission('/finanzas/mantenimientos/depositos', 'lectura')
+  findAll() {
+    return this.depositoService.findAll();
+  }
+
+  @Get(':id')
+  @RequirePermission('/finanzas/mantenimientos/depositos', 'lectura')
+  findOne(@Param('id') id: string) {
+    return this.depositoService.findOne(+id);
+  }
+
+  @Patch(':id')
+  @RequirePermission('/finanzas/mantenimientos/depositos', 'escritura')
+  update(@Param('id') id: string, @Body() updateDto: UpdateDepositoDto) {
+    return this.depositoService.update(+id, updateDto);
+  }
+
+  @Delete(':id')
+  @RequirePermission('/finanzas/mantenimientos/depositos', 'eliminacion')
+  remove(@Param('id') id: string) {
+    return this.depositoService.remove(+id);
+  }
+}

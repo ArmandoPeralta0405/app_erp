@@ -1,0 +1,51 @@
+// src/usuario_rol/usuario_rol.controller.ts
+
+import {
+  Controller,
+  Post,
+  Body,
+  Delete,
+  Param,
+  ParseIntPipe,
+  ValidationPipe,
+  Get,
+  UseGuards, // 💡 Importar UseGuards
+} from '@nestjs/common';
+import { UsuarioRolService } from './usuario_rol.service';
+import { CreateUsuarioRolDto } from './dto/create_usuario_rol.dto';
+import { AuthGuard } from '@nestjs/passport'; // 💡 Importar AuthGuard
+
+@UseGuards(AuthGuard('jwt'))
+@Controller('usuario_rol')
+export class UsuarioRolController {
+  constructor(private readonly usuarioRolService: UsuarioRolService) { }
+
+  // 1. ASIGNAR ROL (POST /usuario_rol)
+  // Cuerpo: { id_usuario: 1, id_rol: 2 }
+  @Post()
+  async assignRole(
+    @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+    createUsuarioRolDto: CreateUsuarioRolDto,
+  ) {
+    // Llama al servicio para crear la asignación
+    return this.usuarioRolService.create(createUsuarioRolDto);
+  }
+
+  // 2. DESASIGNAR ROL (DELETE /usuario_rol/usuario/:idUsuario/rol/:idRol)
+  // Elimina la asignación específica.
+  @Delete('usuario/:idUsuario/rol/:idRol')
+  async removeRole(
+    @Param('idUsuario', ParseIntPipe) idUsuario: number,
+    @Param('idRol', ParseIntPipe) idRol: number,
+  ) {
+    // Llama al servicio para eliminar el registro con la clave compuesta
+    return this.usuarioRolService.remove(idUsuario, idRol);
+  }
+
+  // 3. OBTENER ROLES ASIGNADOS (GET /usuario_rol/usuario/:idUsuario)
+  // Consulta todos los roles de un usuario.
+  @Get('usuario/:idUsuario')
+  async getRolesByUsuario(@Param('idUsuario', ParseIntPipe) idUsuario: number) {
+    return this.usuarioRolService.findRolesByUsuario(idUsuario);
+  }
+}

@@ -1,0 +1,90 @@
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow-lg p-4" style="width: 100%; max-width: 600px; border-radius: 15px;">
+        <div class="card-body">
+            <h3 class="text-center text-primary mb-4 fw-bold">Registro de Usuario</h3>
+            <form (ngSubmit)="onRegister()">
+
+                <!-- Fila 1: Nombre y Apellido -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="nombre" class="form-label text-muted">Nombre</label>
+                        <div class="input-group">
+                            <span class="input-group-text border-end-0"><i class="fas fa-user text-primary"></i></span>
+                            <input type="text" class="form-control border-start-0" id="nombre" name="nombre"
+                                [(ngModel)]="usuario.nombre" placeholder="Nombre" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="apellido" class="form-label text-muted">Apellido</label>
+                        <div class="input-group">
+                            <span class="input-group-text border-end-0"><i class="fas fa-user text-primary"></i></span>
+                            <input type="text" class="form-control border-start-0" id="apellido" name="apellido"
+                                [(ngModel)]="usuario.apellido" placeholder="Apellido" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fila 2: Cédula y Teléfono -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="cedula" class="form-label text-muted">Cédula</label>
+                        <div class="input-group">
+                            <span class="input-group-text border-end-0"><i
+                                    class="fas fa-id-card text-primary"></i></span>
+                            <input type="text" class="form-control border-start-0" id="cedula" name="cedula"
+                                [(ngModel)]="usuario.cedula" placeholder="Cédula">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="telefono" class="form-label text-muted">Teléfono</label>
+                        <div class="input-group">
+                            <span class="input-group-text border-end-0"><i class="fas fa-phone text-primary"></i></span>
+                            <input type="text" class="form-control border-start-0" id="telefono" name="telefono"
+                                [(ngModel)]="usuario.telefono" placeholder="Teléfono">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fila 3: Dirección -->
+                <div class="mb-3">
+                    <label for="direccion" class="form-label text-muted">Dirección</label>
+                    <div class="input-group">
+                        <span class="input-group-text border-end-0"><i
+                                class="fas fa-map-marker-alt text-primary"></i></span>
+                        <input type="text" class="form-control border-start-0" id="direccion" name="direccion"
+                            [(ngModel)]="usuario.direccion" placeholder="Dirección completa">
+                    </div>
+                </div>
+
+                <!-- Fila 4: Alias y Clave -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label for="alias" class="form-label text-muted">Usuario (Alias)</label>
+                        <div class="input-group">
+                            <span class="input-group-text border-end-0"><i
+                                    class="fas fa-user-circle text-primary"></i></span>
+                            <input type="text" class="form-control border-start-0" id="alias" name="alias"
+                                [(ngModel)]="usuario.alias" placeholder="Alias" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="clave" class="form-label text-muted">Contraseña</label>
+                        <div class="input-group">
+                            <span class="input-group-text border-end-0"><i class="fas fa-lock text-primary"></i></span>
+                            <input type="password" class="form-control border-start-0" id="clave" name="clave"
+                                [(ngModel)]="usuario.clave" placeholder="********" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg fw-bold">Registrarse</button>
+                </div>
+
+                <div class="text-center mt-3">
+                    <a routerLink="/login" class="text-decoration-none small">¿Ya tienes cuenta? Inicia Sesión</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

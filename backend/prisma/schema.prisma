@@ -1,0 +1,360 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model deposito {
+  id_deposito       Int                 @id(map: "pk_deposito") @default(autoincrement())
+  id_sucursal       Int
+  nombre            String              @db.VarChar(150)
+  estado            Boolean?            @default(true)
+  articulo_deposito articulo_deposito[]
+  sucursal          sucursal            @relation(fields: [id_sucursal], references: [id_sucursal], onDelete: NoAction, onUpdate: NoAction, map: "fk_deposito_sucursal")
+
+  @@index([id_sucursal], map: "idx_deposito_sucursal")
+  @@index([estado], map: "idx_deposito_estado")
+}
+
+model empresa {
+  id_empresa   Int        @id(map: "PK_EMPRESA") @default(autoincrement())
+  razon_social String     @db.VarChar(250)
+  ruc          String     @db.VarChar(15)
+  dv           String     @db.VarChar(2)
+  telefono     String?    @db.VarChar(25)
+  direccion    String?    @db.VarChar(500)
+  correo       String?    @db.VarChar(250)
+  estado       Boolean?   @default(true)
+  sucursal     sucursal[]
+}
+
+model moneda {
+  id_moneda        Int          @id(map: "pk_moneda") @default(autoincrement())
+  nombre           String       @db.VarChar(150)
+  simbolo          String       @db.VarChar(5)
+  cantidad_decimal Int?         @default(0)
+  estado           Boolean?     @default(true)
+  cotizacion       cotizacion[]
+}
+
+model sucursal {
+  id_sucursal  Int        @id(map: "pk_sucursal") @default(autoincrement())
+  id_empresa   Int
+  nombre       String     @db.VarChar(150)
+  telefono     String?    @db.VarChar(25)
+  direccion    String?    @db.VarChar(500)
+  correo       String?    @db.VarChar(250)
+  estado       Boolean?   @default(true)
+  casa_central String?    @default("N") @db.VarChar(1)
+  deposito     deposito[]
+  empresa      empresa    @relation(fields: [id_empresa], references: [id_empresa], onDelete: NoAction, onUpdate: NoAction, map: "fk_sucursal_empresa")
+
+  @@index([id_empresa], map: "idx_sucursal_empresa")
+  @@index([estado], map: "idx_sucursal_estado")
+}
+
+model rol {
+  id_rol       Int            @id(map: "pk_rol") @default(autoincrement())
+  nombre       String         @db.VarChar(150)
+  descripcion  String?        @db.VarChar(250)
+  estado       Boolean?       @default(true)
+  rol_programa rol_programa[]
+  usuario_rol  usuario_rol[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model modulo {
+  id_modulo   Int        @id(map: "pk_modulo") @default(autoincrement())
+  nombre      String     @db.VarChar(150)
+  descripcion String?    @db.VarChar(250)
+  estado      Boolean?   @default(true)
+  programa    programa[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model categoria_programa {
+  id_categoria_programa Int        @id(map: "pk_categoria_programa") @default(autoincrement())
+  nombre                String     @db.VarChar(150)
+  descripcion           String?    @db.VarChar(250)
+  estado                Boolean?   @default(true)
+  programa              programa[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model programa {
+  id_programa           Int                @id(map: "pk_programa") @default(autoincrement())
+  id_modulo             Int
+  id_categoria_programa Int
+  titulo                String             @db.VarChar(150)
+  codigo_alfanumerico   String             @unique(map: "uk_programa_codigo") @db.VarChar(50)
+  ruta_acceso           String             @db.VarChar(250)
+  estado                Boolean?           @default(true)
+  categoria_programa    categoria_programa @relation(fields: [id_categoria_programa], references: [id_categoria_programa], onDelete: NoAction, onUpdate: NoAction, map: "fk_programa_categoria")
+  modulo                modulo             @relation(fields: [id_modulo], references: [id_modulo], onDelete: NoAction, onUpdate: NoAction, map: "fk_programa_modulo")
+  rol_programa          rol_programa[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model rol_programa {
+  id_rol             Int
+  id_programa        Int
+  acceso_lectura     Boolean  @default(false)
+  acceso_escritura   Boolean  @default(false)
+  acceso_eliminacion Boolean  @default(false)
+  programa           programa @relation(fields: [id_programa], references: [id_programa], onDelete: Cascade, onUpdate: NoAction, map: "fk_rol_programa_programa")
+  rol                rol      @relation(fields: [id_rol], references: [id_rol], onDelete: Cascade, onUpdate: NoAction, map: "fk_rol_programa_rol")
+
+  @@id([id_rol, id_programa], map: "pk_rol_programa")
+}
+
+model usuario {
+  id_usuario                                       Int           @id(map: "pk_usuario") @default(autoincrement())
+  nombre                                           String        @db.VarChar(150)
+  apellido                                         String        @db.VarChar(150)
+  cedula                                           String?       @db.VarChar(20)
+  telefono                                         String?       @db.VarChar(25)
+  direccion                                        String?       @db.VarChar(500)
+  estado                                           Boolean?      @default(true)
+  alias                                            String        @unique(map: "uk_usuario_alias") @db.VarChar(50)
+  clave                                            String        @db.VarChar(250)
+  fecha_creacion                                   DateTime?     @default(now()) @db.Timestamptz(6)
+  fecha_actualizacion                              DateTime?     @default(now()) @db.Timestamptz(6)
+  articulo_articulo_usuario_actualizacionTousuario articulo[]    @relation("articulo_usuario_actualizacionTousuario")
+  articulo_articulo_usuario_creacionTousuario      articulo[]    @relation("articulo_usuario_creacionTousuario")
+  usuario_rol                                      usuario_rol[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model usuario_rol {
+  id_usuario Int
+  id_rol     Int
+  rol        rol     @relation(fields: [id_rol], references: [id_rol], onDelete: Cascade, map: "fk_usuario_rol_rol")
+  usuario    usuario @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade, map: "fk_usuario_rol_usuario")
+
+  @@id([id_usuario, id_rol], map: "pk_usuario_rol")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model impuesto {
+  id_impuesto   Int        @id(map: "pk_impuesto") @default(autoincrement())
+  nombre        String     @db.VarChar(150)
+  abreviacion   String     @db.VarChar(50)
+  valor_calculo Decimal    @db.Decimal(24, 4)
+  estado        Boolean?   @default(true)
+  articulo      articulo[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model cotizacion {
+  id_moneda   Int
+  fecha       DateTime @db.Date
+  tasa_compra Decimal  @db.Decimal(24, 4)
+  tasa_venta  Decimal  @db.Decimal(24, 4)
+  moneda      moneda   @relation(fields: [id_moneda], references: [id_moneda], onDelete: NoAction, onUpdate: NoAction, map: "fk_cotizacion_moneda")
+
+  @@id([id_moneda, fecha], map: "pk_cotizacion")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model marca {
+  id_marca Int        @id(map: "pk_marca") @default(autoincrement())
+  nombre   String     @db.VarChar(150)
+  articulo articulo[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model linea {
+  id_linea Int        @id(map: "pk_linea") @default(autoincrement())
+  nombre   String     @db.VarChar(150)
+  articulo articulo[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model tipo_articulo {
+  id_tipo_articulo Int        @id(map: "pk_tipo_articulo") @default(autoincrement())
+  nombre           String     @db.VarChar(150)
+  articulo         articulo[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model unidad_medida {
+  id_unidad_medida      Int                     @id(map: "pk_unidad_medida") @default(autoincrement())
+  nombre                String                  @db.VarChar(150)
+  simbolo               String                  @db.VarChar(10)
+  factor_conversion     Decimal                 @default(1) @db.Decimal(24, 4)
+  codigo_iso            String?                 @db.VarChar(10)
+  es_base               Boolean                 @default(false)
+  estado                Boolean?                @default(true)
+  articulo              articulo[]
+  articulo_codigo_barra articulo_codigo_barra[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model articulo {
+  id_articulo                                     Int                     @id(map: "pk_articulo") @default(autoincrement())
+  codigo_alfanumerico                             String?                 @db.VarChar(100)
+  referencia                                      String?                 @db.VarChar(200)
+  nombre                                          String                  @db.VarChar(250)
+  descripcion                                     String?                 @db.VarChar(500)
+  id_linea                                        Int?
+  id_tipo_articulo                                Int?
+  id_marca                                        Int?
+  id_unidad_medida                                Int
+  id_impuesto                                     Int?
+  estado                                          Boolean?                @default(true)
+  fecha_creacion                                  DateTime?               @default(now()) @db.Timestamp(6)
+  fecha_actualizacion                             DateTime?               @default(now()) @db.Timestamp(6)
+  usuario_creacion                                Int?
+  usuario_actualizacion                           Int?
+  impuesto                                        impuesto?               @relation(fields: [id_impuesto], references: [id_impuesto], onDelete: NoAction, onUpdate: NoAction, map: "fk_articulo_impuesto")
+  linea                                           linea?                  @relation(fields: [id_linea], references: [id_linea], onDelete: NoAction, onUpdate: NoAction, map: "fk_articulo_linea")
+  marca                                           marca?                  @relation(fields: [id_marca], references: [id_marca], onDelete: NoAction, onUpdate: NoAction, map: "fk_articulo_marca")
+  tipo_articulo                                   tipo_articulo?          @relation(fields: [id_tipo_articulo], references: [id_tipo_articulo], onDelete: NoAction, onUpdate: NoAction, map: "fk_articulo_tipo_articulo")
+  unidad_medida                                   unidad_medida           @relation(fields: [id_unidad_medida], references: [id_unidad_medida], onDelete: NoAction, onUpdate: NoAction, map: "fk_articulo_unidad_medida")
+  usuario_articulo_usuario_actualizacionTousuario usuario?                @relation("articulo_usuario_actualizacionTousuario", fields: [usuario_actualizacion], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_articulo_usuario_actualizacion")
+  usuario_articulo_usuario_creacionTousuario      usuario?                @relation("articulo_usuario_creacionTousuario", fields: [usuario_creacion], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_articulo_usuario_creacion")
+  articulo_codigo_barra                           articulo_codigo_barra[]
+  articulo_deposito                               articulo_deposito[]
+
+  @@index([codigo_alfanumerico], map: "idx_articulo_codigo_alfanumerico")
+  @@index([estado], map: "idx_articulo_estado")
+  @@index([id_impuesto], map: "idx_articulo_impuesto")
+  @@index([id_linea], map: "idx_articulo_linea")
+  @@index([id_marca], map: "idx_articulo_marca")
+  @@index([nombre], map: "idx_articulo_nombre")
+  @@index([referencia], map: "idx_articulo_referencia")
+  @@index([id_tipo_articulo], map: "idx_articulo_tipo")
+  @@index([usuario_actualizacion], map: "idx_articulo_usuario_actualizacion")
+  @@index([usuario_creacion], map: "idx_articulo_usuario_creacion")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model articulo_codigo_barra {
+  id_articulo       Int
+  codigo_barra      String        @unique(map: "uk_codigo_barra") @db.VarChar(100)
+  tipo_codigo_barra String?       @db.VarChar(50)
+  id_unidad_medida  Int
+  es_principal      Boolean?      @default(false)
+  estado            Boolean?      @default(true)
+  fecha_creacion    DateTime?     @default(now()) @db.Timestamp(6)
+  articulo          articulo      @relation(fields: [id_articulo], references: [id_articulo], onDelete: Cascade, onUpdate: NoAction, map: "fk_codigo_barra_articulo")
+  unidad_medida     unidad_medida @relation(fields: [id_unidad_medida], references: [id_unidad_medida], onDelete: NoAction, onUpdate: NoAction, map: "fk_codigo_barra_unidad_medida")
+
+  @@id([id_articulo, codigo_barra], map: "pk_articulo_codigo_barra")
+  @@index([id_articulo], map: "idx_codigo_barra_articulo")
+  @@index([codigo_barra], map: "idx_codigo_barra_codigo")
+  @@index([estado], map: "idx_codigo_barra_estado")
+  @@index([tipo_codigo_barra], map: "idx_codigo_barra_tipo")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model pais {
+  id_pais         Int            @id(map: "pk_pais") @default(autoincrement())
+  nombre          String         @unique(map: "uk_pais_nombre") @db.VarChar(150)
+  codigo_iso      String         @unique(map: "uk_pais_codigo_iso") @db.VarChar(3)
+  codigo_iso2     String?        @db.VarChar(2)
+  codigo_telefono String?        @db.VarChar(10)
+  estado          Boolean?       @default(true)
+  departamento    departamento[]
+
+  @@index([estado], map: "idx_pais_estado")
+  @@index([nombre], map: "idx_pais_nombre")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model departamento {
+  id_departamento Int      @id(map: "pk_departamento") @default(autoincrement())
+  id_pais         Int
+  nombre          String   @db.VarChar(150)
+  estado          Boolean? @default(true)
+  ciudad          ciudad[]
+  pais            pais     @relation(fields: [id_pais], references: [id_pais], onDelete: NoAction, onUpdate: NoAction, map: "fk_departamento_pais")
+
+  @@index([estado], map: "idx_departamento_estado")
+  @@index([nombre], map: "idx_departamento_nombre")
+  @@index([id_pais], map: "idx_departamento_pais")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ciudad {
+  id_ciudad       Int          @id @default(autoincrement())
+  id_departamento Int
+  nombre          String       @db.VarChar(150)
+  estado          Boolean?     @default(true)
+  departamento    departamento @relation(fields: [id_departamento], references: [id_departamento], onDelete: NoAction, onUpdate: NoAction, map: "fk_ciudad_departamento")
+  cliente         cliente[]
+  proveedor       proveedor[]
+
+  @@index([id_departamento], map: "idx_ciudad_departamento")
+  @@index([estado], map: "idx_ciudad_estado")
+  @@index([nombre], map: "idx_ciudad_nombre")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model cliente {
+  id_cliente       Int      @id @default(autoincrement())
+  id_ciudad        Int
+  nombre           String   @db.VarChar(250)
+  es_contribuyente Boolean? @default(false)
+  ruc              String?  @db.VarChar(20)
+  ci               String?  @db.VarChar(20)
+  dv               String?  @db.VarChar(2)
+  telefono         String?  @db.VarChar(50)
+  direccion        String?  @db.VarChar(200)
+  email            String?  @db.VarChar(250)
+  estado           Boolean? @default(true)
+  ciudad           ciudad   @relation(fields: [id_ciudad], references: [id_ciudad], onDelete: NoAction, onUpdate: NoAction, map: "fk_cliente_ciudad")
+
+  @@index([ci], map: "idx_cliente_ci")
+  @@index([id_ciudad], map: "idx_cliente_ciudad")
+  @@index([nombre], map: "idx_cliente_nombre")
+  @@index([ruc], map: "idx_cliente_ruc")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model proveedor {
+  id_proveedor           Int      @id @default(autoincrement())
+  id_ciudad              Int
+  razon_social           String   @db.VarChar(250)
+  es_contribuyente       Boolean? @default(false)
+  ruc                    String   @db.VarChar(20)
+  dv                     String?  @db.VarChar(2)
+  telefono               String?  @db.VarChar(50)
+  direccion              String?  @db.VarChar(200)
+  email                  String?  @db.VarChar(250)
+  representante_nombre   String?  @db.VarChar(150)
+  representante_telefono String?  @db.VarChar(50)
+  representante_email    String?  @db.VarChar(100)
+  estado                 Boolean? @default(true)
+  ciudad                 ciudad   @relation(fields: [id_ciudad], references: [id_ciudad], onDelete: NoAction, onUpdate: NoAction, map: "fk_proveedor_ciudad")
+
+  @@index([id_ciudad], map: "idx_proveedor_ciudad")
+  @@index([razon_social], map: "idx_proveedor_razon_social")
+  @@index([ruc], map: "idx_proveedor_ruc")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model articulo_deposito {
+  id_articulo Int
+  id_deposito Int
+  existencia  Decimal? @default(0) @db.Decimal(24, 4)
+  articulo    articulo @relation(fields: [id_articulo], references: [id_articulo], onDelete: NoAction, onUpdate: NoAction, map: "fk_articulo_deposito_articulo")
+  deposito    deposito @relation(fields: [id_deposito], references: [id_deposito], onDelete: NoAction, onUpdate: NoAction, map: "fk_articulo_deposito_deposito")
+
+  @@id([id_articulo, id_deposito], map: "pk_articulo_deposito")
+  @@index([id_articulo], map: "idx_articulo_deposito_articulo")
+  @@index([id_deposito], map: "idx_articulo_deposito_deposito")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model motivo_ajuste_inventario {
+  id_motivo_ajuste_inventario Int      @id(map: "pk_motivo_ajuste_inventario") @default(autoincrement())
+  nombre                      String   @db.VarChar(100)
+  descripcion                 String?  @db.VarChar(250)
+  estado                      Boolean? @default(true)
+
+  @@index([estado], map: "idx_motivo_ajuste_inventario_estado")
+}

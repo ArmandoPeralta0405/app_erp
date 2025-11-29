@@ -1,0 +1,110 @@
+<div class="bg-white border-right" id="sidebar-wrapper">
+    <div class="sidebar-heading fw-bold text-center py-4 fs-4 border-bottom">
+        <span class="text-primary">ERP</span> System
+    </div>
+
+    <!-- Buscador con sugerencias -->
+    <div class="px-3 py-3 position-relative">
+        <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
+            <input type="text" class="form-control bg-light border-start-0" placeholder="Buscar programas..."
+                [(ngModel)]="searchTerm" (input)="onSearch()" (keydown)="onSearchKeyDown($event)" aria-label="Buscar">
+            <button *ngIf="searchTerm" class="btn btn-light border-start-0" (click)="clearSearch()" type="button">
+                <i class="fas fa-times text-muted"></i>
+            </button>
+        </div>
+
+        <!-- Dropdown de resultados -->
+        <div *ngIf="showSearchResults" class="search-results position-absolute bg-white border rounded shadow-sm"
+            style="max-height: 400px; overflow-y: auto; z-index: 1000; left: 1rem; right: 1rem; margin-top: 0.25rem;">
+            <div *ngFor="let result of searchResults; let i = index" class="search-result-item p-2 border-bottom"
+                [class.bg-light]="i === selectedIndex" (click)="navigateToResult(result)" style="cursor: pointer;">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-file-alt text-primary me-2"></i>
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold small">{{ result.titulo }}</div>
+                        <small class="text-muted">
+                            <i class="fas fa-folder me-1"></i>{{ result.modulo }}
+                            <span *ngIf="result.categoria"> / {{ result.categoria }}</span>
+                        </small>
+                    </div>
+                    <i class="fas fa-arrow-right text-muted ms-2"></i>
+                </div>
+            </div>
+            <div *ngIf="searchResults.length === 0 && searchTerm.length >= 2" class="p-3 text-center text-muted">
+                <i class="fas fa-search mb-2"></i>
+                <p class="mb-0 small">No se encontraron resultados</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Programas dinámicos -->
+    <div class="list-group list-group-flush">
+        <!-- Dashboard fijo -->
+        <a routerLink="/app/dashboard" routerLinkActive="active"
+            class="list-group-item list-group-item-action border-0">
+            <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+        </a>
+
+        <!-- Mostrar loading -->
+        <div *ngIf="loading && !error" class="text-center py-3">
+            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="text-muted small mt-2">Cargando programas...</p>
+        </div>
+
+        <!-- Mostrar error -->
+        <div *ngIf="error" class="text-center py-3 px-3">
+            <i class="fas fa-exclamation-triangle text-warning fa-2x mb-2"></i>
+            <p class="text-muted small">Error al cargar programas. Verifica la consola.</p>
+        </div>
+
+        <!-- Iterar módulos -->
+        <ng-container *ngFor="let modulo of modulos">
+            <!-- Header del módulo (clickable para colapsar) -->
+            <div class="modulo-header px-3 py-2 mt-2 d-flex justify-content-between align-items-center"
+                (click)="toggleModulo(modulo)" style="cursor: pointer;">
+                <div class="d-flex align-items-center">
+                    <i class="fas {{ getIcono(modulo.nombre_modulo, 'modulo') }} me-2 text-primary"></i>
+                    <small class="text-muted fw-bold text-uppercase">{{ modulo.nombre_modulo }}</small>
+                </div>
+                <i class="fas fa-chevron-down text-muted small transition-icon"
+                    [class.rotate-180]="modulo.isCollapsed"></i>
+            </div>
+
+            <!-- Contenedor de categorías (colapsable) -->
+            <div [hidden]="modulo.isCollapsed">
+                <!-- Iterar categorías del módulo -->
+                <ng-container *ngFor="let categoria of modulo.categorias">
+                    <!-- Subheader de categoría (clickable para colapsar) -->
+                    <div class="categoria-header px-4 py-1 d-flex justify-content-between align-items-center"
+                        *ngIf="categoria.nombre_categoria" (click)="toggleCategoria(categoria)"
+                        style="cursor: pointer;">
+                        <div class="d-flex align-items-center">
+                            <i class="fas {{ getIcono(categoria.nombre_categoria, 'categoria') }} me-2 text-muted"
+                                style="font-size: 0.8rem;"></i>
+                            <small class="text-muted fst-italic">{{ categoria.nombre_categoria }}</small>
+                        </div>
+                        <i class="fas fa-chevron-down text-muted small transition-icon"
+                            [class.rotate-180]="categoria.isCollapsed" style="font-size: 0.7rem;"></i>
+                    </div>
+
+                    <!-- Contenedor de programas (colapsable) -->
+                    <div [hidden]="categoria.isCollapsed">
+                        <!-- Iterar programas de la categoría -->
+                        <a *ngFor="let programa of categoria.programas" [routerLink]="'/app' + programa.ruta_acceso"
+                            routerLinkActive="active" class="list-group-item list-group-item-action border-0 ps-4">
+                            <i class="fas {{ getIcono(programa.titulo, 'programa') }} me-2"></i> {{ programa.titulo }}
+                        </a>
+                    </div>
+                </ng-container>
+            </div>
+        </ng-container>
+
+        <!-- Mensaje si no hay programas -->
+        <div *ngIf="!loading && !error && modulos.length === 0" class="text-center py-3 text-muted">
+            <small>No hay programas disponibles</small>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,83 @@
+// src/rol_programa/rol_programa.controller.ts (Versión con DTOs)
+
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Delete,
+  NotFoundException,
+  ValidationPipe, // 💡 Importar ValidationPipe
+  UseGuards, // 💡 Importar UseGuards
+} from '@nestjs/common';
+import { RolProgramaService } from './rol_programa.service';
+// 💡 Importar DTOs
+import { CreateRolProgramaDto } from './dto/create_rol_programa.dto';
+import { UpdateRolProgramaDto } from './dto/update_rol_programa.dto';
+import { AuthGuard } from '@nestjs/passport'; // 💡 Importar AuthGuard
+
+// ❌ Eliminamos los tipos manuales
+
+@UseGuards(AuthGuard('jwt'))
+@Controller('rol_programa') // Recomendaría usar kebab-case para consistencia en la ruta
+export class RolProgramaController {
+  constructor(private readonly rolProgramaService: RolProgramaService) { }
+
+  // 1. OBTENER TODOS LOS PERMISOS (GET /rol-programa)
+  @Get()
+  async findAll() {
+    return this.rolProgramaService.findAll();
+  }
+
+  // 2. OBTENER UN PERMISO POR CLAVE COMPUESTA (GET /rol-programa/rol/1/programa/5)
+  // 💡 El controller ya maneja la lógica de clave compuesta, solo necesitamos usar el findOne del Service
+  @Get('rol/:rolId/programa/:programaId')
+  async findOne(
+    @Param('rolId', ParseIntPipe) rolId: number,
+    @Param('programaId', ParseIntPipe) programaId: number,
+  ) {
+    // El servicio lanzará NotFoundException si no existe
+    return this.rolProgramaService.findOne({
+      id_rol_id_programa: { id_rol: rolId, id_programa: programaId },
+    });
+  }
+
+  // 3. CREAR UN NUEVO PERMISO (POST /rol-programa) (💡 Usamos DTO y ValidationPipe)
+  @Post()
+  async create(
+    @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+    createRolProgramaDto: CreateRolProgramaDto,
+  ) {
+    return this.rolProgramaService.create(createRolProgramaDto);
+  }
+
+  // 4. ACTUALIZAR PERMISOS (PATCH /rol-programa/rol/1/programa/5) (💡 Usamos DTO y ValidationPipe)
+  @Patch('rol/:rolId/programa/:programaId')
+  async update(
+    @Param('rolId', ParseIntPipe) rolId: number,
+    @Param('programaId', ParseIntPipe) programaId: number,
+    @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+    updateRolProgramaDto: UpdateRolProgramaDto,
+  ) {
+    // El servicio lanza NotFoundException si no encuentra el recurso
+    return this.rolProgramaService.update(
+      { id_rol_id_programa: { id_rol: rolId, id_programa: programaId } },
+      updateRolProgramaDto,
+    );
+  }
+
+  // 5. ELIMINAR UN PERMISO (DELETE /rol-programa/rol/1/programa/5)
+  @Delete('rol/:rolId/programa/:programaId')
+  async remove(
+    @Param('rolId', ParseIntPipe) rolId: number,
+    @Param('programaId', ParseIntPipe) programaId: number,
+  ) {
+    // El servicio lanza NotFoundException si no encuentra el recurso
+    return this.rolProgramaService.remove({
+      id_rol_id_programa: { id_rol: rolId, id_programa: programaId },
+    });
+  }
+}

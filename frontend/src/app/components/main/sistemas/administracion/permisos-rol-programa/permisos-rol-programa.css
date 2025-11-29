@@ -1,0 +1,272 @@
+/* Estilos para el componente Permisos Rol-Programa */
+
+/* Header */
+h4 {
+    font-size: 1.5rem;
+    letter-spacing: -0.5px;
+}
+
+h6 {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* Card */
+.card {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 1rem;
+    font-weight: 600;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Lista de Roles */
+.list-group-item {
+    border-left: none;
+    border-right: none;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.list-group-item:first-child {
+    border-top: none;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+.list-group-item.active {
+    background-color: #003366;
+    border-color: #003366;
+    color: white;
+}
+
+.list-group-item.active .text-muted {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Buscador */
+.input-group-text {
+    border-right: 0;
+}
+
+.input-group .form-control {
+    border-left: 0;
+}
+
+.input-group .form-control:focus {
+    border-color: #ced4da;
+    box-shadow: none;
+}
+
+/* Tabla */
+.table {
+    margin-bottom: 0;
+    font-size: 0.875rem;
+}
+
+.table thead th {
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+    padding: 0.75rem 1rem;
+    white-space: nowrap;
+}
+
+.table tbody td {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    vertical-align: middle;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Badges */
+.badge {
+    font-weight: 500;
+    padding: 0.25em 0.5em;
+    font-size: 0.75rem;
+}
+
+.bg-primary-subtle {
+    background-color: #cfe2ff !important;
+}
+
+.text-primary {
+    color: #003366 !important;
+}
+
+.bg-info-subtle {
+    background-color: #cff4fc !important;
+}
+
+.text-info {
+    color: #0dcaf0 !important;
+}
+
+/* Checkboxes */
+.form-check-input {
+    cursor: pointer;
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.form-check-input:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.form-check-input:checked {
+    background-color: #003366;
+    border-color: #003366;
+}
+
+.form-switch .form-check-input {
+    width: 2.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .col-md-3 {
+        margin-bottom: 1rem;
+    }
+
+    .table {
+        font-size: 0.8rem;
+    }
+
+    .table thead {
+        display: none;
+    }
+
+    .table,
+    .table tbody,
+    .table tr,
+    .table td {
+        display: block;
+        width: 100%;
+    }
+
+    .table tbody tr {
+        margin-bottom: 1rem;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 0.75rem;
+        background-color: white;
+    }
+
+    .table tbody td {
+        text-align: left;
+        padding: 0.5rem 0;
+        border: none;
+        position: relative;
+    }
+
+    .table tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #6c757d;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .table tbody td:first-child::before {
+        content: "Programa";
+    }
+
+    .table tbody td:nth-child(2)::before {
+        content: "Módulo";
+    }
+
+    .table tbody td:nth-child(3)::before {
+        content: "Categoría";
+    }
+
+    .table tbody td:nth-child(4)::before {
+        content: "Asignado";
+    }
+
+    .table tbody td:nth-child(5)::before {
+        content: "Lectura";
+    }
+
+    .table tbody td:nth-child(6)::before {
+        content: "Escritura";
+    }
+
+    .table tbody td:nth-child(7)::before {
+        content: "Eliminación";
+    }
+
+    h4 {
+        font-size: 1.25rem;
+    }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.table tbody tr {
+    animation: fadeIn 0.3s ease;
+}
+
+.list-group-item {
+    animation: fadeIn 0.2s ease;
+}
+
+/* Paginación */
+.pagination {
+    margin: 0;
+}
+
+.page-link {
+    color: #003366;
+    border-color: #dee2e6;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.page-link:hover {
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+    color: #002244;
+}
+
+.page-item.active .page-link {
+    background-color: #003366;
+    border-color: #003366;
+    color: white;
+    font-weight: 700;
+    box-shadow: 0 2px 4px rgba(0, 51, 102, 0.3);
+}
+
+.page-item.disabled .page-link {
+    color: #6c757d;
+    cursor: default;
+    background-color: transparent;
+}

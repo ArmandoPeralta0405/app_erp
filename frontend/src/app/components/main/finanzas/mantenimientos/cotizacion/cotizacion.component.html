@@ -1,0 +1,198 @@
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4 class="mb-1 fw-bold text-dark">
+                <i class="fas fa-exchange-alt text-primary me-2"></i>
+                Gestión de Cotizaciones
+            </h4>
+            <p class="text-muted small mb-0">Administra las cotizaciones de monedas</p>
+        </div>
+    </div>
+
+    <!-- Buscador y botón nuevo -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-white">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+                <input type="text" class="form-control" placeholder="Buscar por moneda o fecha..."
+                    [(ngModel)]="searchTerm" (input)="onSearch()">
+            </div>
+        </div>
+        <div class="col-md-6 text-end">
+            <button class="btn btn-primary" (click)="abrirFormularioNuevo()" [disabled]="!canWrite">
+                <i class="fas fa-plus me-2"></i>
+                Nueva Cotización
+            </button>
+        </div>
+    </div>
+
+    <!-- Tabla de cotizaciones -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <div *ngIf="loading" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                        <p class="text-muted mt-2">Cargando cotizaciones...</p>
+                    </div>
+
+                    <div *ngIf="!loading" class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="border-0">Moneda</th>
+                                    <th class="border-0">Símbolo</th>
+                                    <th class="border-0">Fecha</th>
+                                    <th class="border-0">Tasa Compra</th>
+                                    <th class="border-0">Tasa Venta</th>
+                                    <th class="border-0 text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngIf="cotizacionesFiltradas.length === 0">
+                                    <td colspan="6" class="text-center text-muted py-5">
+                                        <i class="fas fa-inbox fa-3x mb-3 d-block text-muted opacity-50"></i>
+                                        <p class="mb-0">{{ searchTerm ? 'No se encontraron resultados' : 'No hay
+                                            cotizaciones registradas' }}</p>
+                                    </td>
+                                </tr>
+                                <tr *ngFor="let cotizacion of cotizacionesPaginadas">
+                                    <td class="align-middle fw-semibold" data-label="Moneda">{{
+                                        cotizacion.moneda?.nombre }}</td>
+                                    <td class="align-middle" data-label="Símbolo">
+                                        <span class="badge bg-light text-dark">{{ cotizacion.moneda?.simbolo }}</span>
+                                    </td>
+                                    <td class="align-middle" data-label="Fecha">{{ cotizacion.fecha | dateFormat }}</td>
+                                    <td class="align-middle" data-label="Tasa Compra">
+                                        <span class="badge bg-danger">{{ cotizacion.tasa_compra |
+                                            numberFormat:(cotizacion.moneda?.cantidad_decimal || 2) }}</span>
+                                    </td>
+                                    <td class="align-middle" data-label="Tasa Venta">
+                                        <span class="badge bg-success">{{ cotizacion.tasa_venta |
+                                            numberFormat:(cotizacion.moneda?.cantidad_decimal || 2) }}</span>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <button class="btn btn-outline-primary"
+                                                (click)="abrirFormularioEditar(cotizacion)" [disabled]="!canWrite"
+                                                title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger"
+                                                (click)="eliminarCotizacion(cotizacion)" [disabled]="!canDelete"
+                                                title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginación -->
+                    <div *ngIf="!loading && cotizacionesFiltradas.length > 0" class="card-footer bg-white border-top">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <small class="text-muted">
+                                    Página {{ currentPage }} de {{ totalPages }}
+                                </small>
+                            </div>
+                            <div class="col-md-6">
+                                <nav aria-label="Paginación">
+                                    <ul class="pagination pagination-sm justify-content-md-end mb-0">
+                                        <li class="page-item" [class.disabled]="currentPage === 1">
+                                            <a class="page-link" (click)="cambiarPagina(currentPage - 1)"
+                                                href="javascript:void(0)">
+                                                <i class="fas fa-chevron-left"></i>
+                                            </a>
+                                        </li>
+                                        <li class="page-item" *ngFor="let page of pages"
+                                            [class.active]="page === currentPage">
+                                            <a class="page-link" (click)="cambiarPagina(page)"
+                                                href="javascript:void(0)">
+                                                {{ page }}
+                                            </a>
+                                        </li>
+                                        <li class="page-item" [class.disabled]="currentPage === totalPages">
+                                            <a class="page-link" (click)="cambiarPagina(currentPage + 1)"
+                                                href="javascript:void(0)">
+                                                <i class="fas fa-chevron-right"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de formulario -->
+<div class="modal" [class.show]="showForm" [style.display]="showForm ? 'block' : 'none'" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exchange-alt me-2"></i>
+                    {{ isEditing ? 'Editar Cotización' : 'Nueva Cotización' }}
+                </h5>
+                <button type="button" class="btn-close" (click)="cerrarFormulario()"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Moneda <span class="text-danger">*</span></label>
+                        <select class="form-select" [(ngModel)]="formData.id_moneda" name="id_moneda"
+                            (change)="onMonedaChange()" [disabled]="isEditing" required>
+                            <option value="0">Seleccione una moneda</option>
+                            <option *ngFor="let moneda of monedas" [value]="moneda.id_moneda">
+                                {{ moneda.nombre }} ({{ moneda.simbolo }})
+                            </option>
+                        </select>
+                        <small class="text-muted" *ngIf="isEditing">No se puede cambiar la moneda al editar</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Fecha <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" [(ngModel)]="formData.fecha" name="fecha"
+                            [disabled]="isEditing" required>
+                        <small class="text-muted" *ngIf="isEditing">No se puede cambiar la fecha al editar</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tasa de Compra <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" [(ngModel)]="formData.tasa_compra" name="tasa_compra"
+                            appNumberFormat [decimals]="selectedMonedaDecimals" placeholder="Ej: 7.500,00" required>
+                        <small class="text-muted">Formato: separador de miles (punto) y decimales (coma)</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tasa de Venta <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" [(ngModel)]="formData.tasa_venta" name="tasa_venta"
+                            appNumberFormat [decimals]="selectedMonedaDecimals" placeholder="Ej: 7.600,00" required>
+                        <small class="text-muted">Formato: separador de miles (punto) y decimales (coma)</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="cerrarFormulario()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" (click)="guardarCotizacion()">
+                    <i class="fas fa-save me-2"></i>
+                    {{ isEditing ? 'Actualizar' : 'Guardar' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-backdrop fade" [class.show]="showForm" *ngIf="showForm"></div>

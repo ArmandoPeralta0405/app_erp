@@ -1,0 +1,67 @@
+// src/modulo/modulo.controller.ts (Versión con DTOs)
+
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Delete,
+  ValidationPipe, // 💡 Importar ValidationPipe
+  UseGuards, // 💡 Importar UseGuards
+} from '@nestjs/common';
+import { ModuloService } from './modulo.service';
+// 💡 Importar DTOs
+import { CreateModuloDto } from './dto/create_modulo.dto';
+import { UpdateModuloDto } from './dto/update_modulo.dto';
+import { AuthGuard } from '@nestjs/passport'; // 💡 Importar AuthGuard
+
+// ❌ Eliminamos los tipos manuales
+// type CreateModuloData = Omit<ModuloModel, 'id_modulo'>;
+// type UpdateModuloData = Partial<Omit<ModuloModel, 'id_modulo'>>;
+
+@UseGuards(AuthGuard('jwt'))
+@Controller('modulo')
+export class ModuloController {
+  // Asegúrate de que 'export' esté aquí.
+  constructor(private readonly moduloService: ModuloService) { }
+
+  // 1. OBTENER TODOS LOS MÓDULOS ACTIVOS (GET /modulo)
+  @Get()
+  async findAll() {
+    return this.moduloService.findAll();
+  }
+
+  // 2. OBTENER UN MÓDULO POR ID (GET /modulo/1)
+  @Get(':id')
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.moduloService.findOne(id);
+  }
+
+  // 3. CREAR UN NUEVO MÓDULO (POST /modulo) (💡 Usamos DTO y ValidationPipe)
+  @Post()
+  async create(
+    @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+    createModuloDto: CreateModuloDto, // 💡 Usar DTO
+  ) {
+    return this.moduloService.create(createModuloDto);
+  }
+
+  // 4. ACTUALIZAR UN MÓDULO (PATCH /modulo/1) (💡 Usamos DTO y ValidationPipe)
+  @Patch(':id')
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+    updateModuloDto: UpdateModuloDto, // 💡 Usar DTO
+  ) {
+    return this.moduloService.update(id, updateModuloDto);
+  }
+
+  // 5. ELIMINACIÓN LÓGICA (DELETE /modulo/1)
+  @Delete(':id')
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return this.moduloService.remove(id);
+  }
+}

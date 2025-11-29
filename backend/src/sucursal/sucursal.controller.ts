@@ -1,0 +1,36 @@
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { SucursalService } from './sucursal.service';
+import { CreateSucursalDto } from './dto/create_sucursal.dto';
+import { UpdateSucursalDto } from './dto/update_sucursal.dto';
+
+@Controller('sucursal')
+@UseGuards(AuthGuard('jwt'))
+export class SucursalController {
+  constructor(private readonly sucursalService: SucursalService) { }
+
+  @Post()
+  create(@Body() createDto: CreateSucursalDto) {
+    return this.sucursalService.create(createDto);
+  }
+
+  @Get()
+  findAll() {
+    return this.sucursalService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.sucursalService.findOne(+id);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateDto: UpdateSucursalDto) {
+    return this.sucursalService.update(+id, updateDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.sucursalService.remove(+id);
+  }
+}

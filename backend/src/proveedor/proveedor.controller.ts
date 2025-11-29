@@ -1,0 +1,42 @@
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { ProveedorService } from './proveedor.service';
+import { CreateProveedorDto } from './dto/create-proveedor.dto';
+import { UpdateProveedorDto } from './dto/update-proveedor.dto';
+
+
+@Controller('proveedor')
+@UseGuards(AuthGuard('jwt'))
+export class ProveedorController {
+    constructor(private readonly proveedorService: ProveedorService) { }
+
+    @Post()
+
+    create(@Body() createDto: CreateProveedorDto) {
+        return this.proveedorService.create(createDto);
+    }
+
+    @Get()
+
+    findAll() {
+        return this.proveedorService.findAll();
+    }
+
+    @Get(':id')
+
+    findOne(@Param('id') id: string) {
+        return this.proveedorService.findOne(+id);
+    }
+
+    @Patch(':id')
+
+    update(@Param('id') id: string, @Body() updateDto: UpdateProveedorDto) {
+        return this.proveedorService.update(+id, updateDto);
+    }
+
+    @Delete(':id')
+
+    remove(@Param('id') id: string) {
+        return this.proveedorService.remove(+id);
+    }
+}

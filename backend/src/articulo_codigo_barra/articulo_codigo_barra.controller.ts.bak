@@ -1,0 +1,49 @@
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { ArticuloCodigoBarraService } from './articulo_codigo_barra.service';
+import { CreateArticuloCodigoBarraDto } from './dto/create-articulo_codigo_barra.dto';
+import { UpdateArticuloCodigoBarraDto } from './dto/update-articulo_codigo_barra.dto';
+
+@Controller('articulo-codigo-barra')
+export class ArticuloCodigoBarraController {
+    constructor(private readonly service: ArticuloCodigoBarraService) { }
+
+    @Post()
+    create(@Body() createDto: CreateArticuloCodigoBarraDto) {
+        return this.service.create(createDto);
+    }
+
+    @Get()
+    findAll() {
+        return this.service.findAll();
+    }
+
+    @Get('articulo/:idArticulo')
+    findByArticulo(@Param('idArticulo', ParseIntPipe) idArticulo: number) {
+        return this.service.findByArticulo(idArticulo);
+    }
+
+    @Get(':idArticulo/:codigoBarra')
+    findOne(
+        @Param('idArticulo', ParseIntPipe) idArticulo: number,
+        @Param('codigoBarra') codigoBarra: string
+    ) {
+        return this.service.findOne(idArticulo, codigoBarra);
+    }
+
+    @Patch(':idArticulo/:codigoBarra')
+    update(
+        @Param('idArticulo', ParseIntPipe) idArticulo: number,
+        @Param('codigoBarra') codigoBarra: string,
+        @Body() updateDto: UpdateArticuloCodigoBarraDto
+    ) {
+        return this.service.update(idArticulo, codigoBarra, updateDto);
+    }
+
+    @Delete(':idArticulo/:codigoBarra')
+    remove(
+        @Param('idArticulo', ParseIntPipe) idArticulo: number,
+        @Param('codigoBarra') codigoBarra: string
+    ) {
+        return this.service.remove(idArticulo, codigoBarra);
+    }
+}

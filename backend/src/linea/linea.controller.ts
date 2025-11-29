@@ -1,0 +1,42 @@
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { LineaService } from './linea.service';
+import { CreateLineaDto } from './dto/create-linea.dto';
+import { UpdateLineaDto } from './dto/update-linea.dto';
+
+
+@Controller('linea')
+@UseGuards(AuthGuard('jwt'))
+export class LineaController {
+    constructor(private readonly lineaService: LineaService) { }
+
+    @Post()
+
+    create(@Body() createLineaDto: CreateLineaDto) {
+        return this.lineaService.create(createLineaDto);
+    }
+
+    @Get()
+
+    findAll() {
+        return this.lineaService.findAll();
+    }
+
+    @Get(':id')
+
+    findOne(@Param('id', ParseIntPipe) id: number) {
+        return this.lineaService.findOne(id);
+    }
+
+    @Patch(':id')
+
+    update(@Param('id', ParseIntPipe) id: number, @Body() updateLineaDto: UpdateLineaDto) {
+        return this.lineaService.update(id, updateLineaDto);
+    }
+
+    @Delete(':id')
+
+    remove(@Param('id', ParseIntPipe) id: number) {
+        return this.lineaService.remove(id);
+    }
+}

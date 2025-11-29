@@ -1,0 +1,95 @@
+/* Variables de color para fácil mantenimiento */
+:host {
+    --primary-color: #003366;
+    /* Azul Marino Profundo */
+    --secondary-color: #6c757d;
+    /* Gris Medio */
+    --bg-color: #f0f2f5;
+    /* Gris Muy Claro */
+    --card-bg: #ffffff;
+    /* Blanco Puro */
+    --text-main: #2c3e50;
+    /* Gris Oscuro Azulado */
+    --input-border: #ced4da;
+    --input-focus: #003366;
+
+    display: block;
+    background-color: var(--bg-color);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* Tipografía limpia */
+}
+
+.card {
+    background-color: var(--card-bg);
+    border: none;
+    border-radius: 12px;
+    /* Bordes ligeramente menos redondeados para seriedad */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    /* Sombra suave y difusa */
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    /* Movimiento sutil */
+}
+
+/* Sobrescribir utilidades de texto de Bootstrap si es necesario, o usar clases propias */
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #002244;
+    /* Un tono más oscuro al pasar el mouse */
+    border-color: #002244;
+}
+
+.input-group-text {
+    background-color: #fff;
+    border-right: none;
+    color: var(--secondary-color);
+}
+
+.form-control {
+    border-left: none;
+    padding-left: 0;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: var(--input-border);
+    /* Mantener borde gris suave o cambiar a primario */
+}
+
+/* Estilo para cuando el input tiene foco, cambiar color del icono y borde del grupo */
+.input-group:focus-within .input-group-text {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.input-group:focus-within .form-control {
+    border-color: var(--primary-color);
+}
+
+.text-muted {
+    color: var(--secondary-color) !important;
+}
+
+a {
+    color: var(--primary-color);
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #002244;
+    text-decoration: underline !important;
+}

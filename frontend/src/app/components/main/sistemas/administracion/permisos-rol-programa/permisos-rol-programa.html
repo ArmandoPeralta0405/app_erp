@@ -1,0 +1,273 @@
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4 class="mb-1 fw-bold text-dark">
+                <i class="fas fa-shield-alt text-primary me-2"></i>
+                Permisos de Roles
+            </h4>
+            <p class="text-muted small mb-0">Gestiona los permisos de acceso a programas por rol</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Sidebar de Roles -->
+        <div class="col-md-3 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-user-shield me-2"></i>
+                        Seleccionar Rol
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    <div *ngIf="loading" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                    </div>
+
+                    <div *ngIf="!loading" class="list-group list-group-flush">
+                        <button *ngFor="let rol of roles" type="button" class="list-group-item list-group-item-action"
+                            [class.active]="rolSeleccionado?.id_rol === rol.id_rol" (click)="seleccionarRol(rol)">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-semibold">{{ rol.nombre }}</div>
+                                    <small class="text-muted">{{ rol.descripcion || 'Sin descripción' }}</small>
+                                </div>
+                                <i class="fas fa-chevron-right" *ngIf="rolSeleccionado?.id_rol === rol.id_rol"></i>
+                            </div>
+                        </button>
+
+                        <div *ngIf="roles.length === 0" class="text-center text-muted py-4">
+                            <i class="fas fa-inbox fa-2x mb-2 opacity-50"></i>
+                            <p class="mb-0 small">No hay roles disponibles</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de Programas -->
+        <div class="col-md-9">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h6 class="mb-0">
+                                <i class="fas fa-cog me-2"></i>
+                                Programas Disponibles
+                            </h6>
+                            <small class="text-muted" *ngIf="rolSeleccionado">
+                                {{ totalProgramasConPermiso }} de {{ programas.length }} programas asignados
+                            </small>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-white">
+                                    <i class="fas fa-search text-muted"></i>
+                                </span>
+                                <input type="text" class="form-control" placeholder="Buscar programa..."
+                                    [(ngModel)]="searchTerm" (ngModelChange)="onSearch()" [disabled]="!rolSeleccionado">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de acciones masivas -->
+                <div *ngIf="rolSeleccionado" class="card-header bg-light border-bottom">
+                    <div class="row g-2">
+                        <div class="col-12">
+                            <small class="text-muted fw-semibold d-block mb-2">
+                                <i class="fas fa-bolt me-1"></i>Acciones Masivas
+                            </small>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="btn-group btn-group-sm w-100" role="group">
+                                <button type="button" class="btn btn-outline-success" (click)="habilitarTodos()"
+                                    [disabled]="guardando">
+                                    <i class="fas fa-check-circle me-1"></i>Habilitar Todos
+                                </button>
+                                <button type="button" class="btn btn-outline-danger" (click)="deshabilitarTodos()"
+                                    [disabled]="guardando">
+                                    <i class="fas fa-times-circle me-1"></i>Deshabilitar Todos
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="dropdown">
+                                <button class="btn btn-outline-primary btn-sm dropdown-toggle w-100" type="button"
+                                    data-bs-toggle="dropdown" [disabled]="guardando || totalProgramasConPermiso === 0">
+                                    <i class="fas fa-cog me-1"></i>Permisos Masivos
+                                </button>
+                                <ul class="dropdown-menu w-100">
+                                    <li>
+                                        <h6 class="dropdown-header">Lectura</h6>
+                                    </li>
+                                    <li><a class="dropdown-item" href="javascript:void(0)"
+                                            (click)="habilitarLecturaTodos()">
+                                            <i class="fas fa-eye text-success me-2"></i>Habilitar Lectura
+                                        </a></li>
+                                    <li><a class="dropdown-item" href="javascript:void(0)"
+                                            (click)="deshabilitarLecturaTodos()">
+                                            <i class="fas fa-eye-slash text-danger me-2"></i>Deshabilitar Lectura
+                                        </a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <h6 class="dropdown-header">Escritura</h6>
+                                    </li>
+                                    <li><a class="dropdown-item" href="javascript:void(0)"
+                                            (click)="habilitarEscrituraTodos()">
+                                            <i class="fas fa-edit text-success me-2"></i>Habilitar Escritura
+                                        </a></li>
+                                    <li><a class="dropdown-item" href="javascript:void(0)"
+                                            (click)="deshabilitarEscrituraTodos()">
+                                            <i class="fas fa-ban text-danger me-2"></i>Deshabilitar Escritura
+                                        </a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <h6 class="dropdown-header">Eliminación</h6>
+                                    </li>
+                                    <li><a class="dropdown-item" href="javascript:void(0)"
+                                            (click)="habilitarEliminacionTodos()">
+                                            <i class="fas fa-trash text-success me-2"></i>Habilitar Eliminación
+                                        </a></li>
+                                    <li><a class="dropdown-item" href="javascript:void(0)"
+                                            (click)="deshabilitarEliminacionTodos()">
+                                            <i class="fas fa-trash-alt text-danger me-2"></i>Deshabilitar Eliminación
+                                        </a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    <!-- Mensaje cuando no hay rol seleccionado -->
+                    <div *ngIf="!rolSeleccionado" class="text-center text-muted py-5">
+                        <i class="fas fa-hand-pointer fa-3x mb-3 opacity-50"></i>
+                        <p class="mb-0">Selecciona un rol para gestionar sus permisos</p>
+                    </div>
+
+                    <!-- Tabla de programas -->
+                    <div *ngIf="rolSeleccionado" class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="border-0">Programa</th>
+                                    <th class="border-0">Módulo</th>
+                                    <th class="border-0">Categoría</th>
+                                    <th class="border-0 text-center">Asignado</th>
+                                    <th class="border-0 text-center">Lectura</th>
+                                    <th class="border-0 text-center">Escritura</th>
+                                    <th class="border-0 text-center">Eliminación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngIf="programasFiltrados.length === 0">
+                                    <td colspan="7" class="text-center text-muted py-5">
+                                        <i class="fas fa-inbox fa-3x mb-3 d-block opacity-50"></i>
+                                        <p class="mb-0">{{ searchTerm ? 'No se encontraron resultados' : 'No hay
+                                            programas disponibles' }}</p>
+                                    </td>
+                                </tr>
+
+                                <tr *ngFor="let programa of programasPaginados">
+                                    <td class="align-middle">
+                                        <div class="fw-semibold">{{ programa.titulo }}</div>
+                                        <small class="text-muted">{{ programa.codigo_alfanumerico }}</small>
+                                    </td>
+                                    <td class="align-middle">
+                                        <span class="badge bg-primary-subtle text-primary">
+                                            {{ programa.modulo?.nombre || 'N/A' }}
+                                        </span>
+                                    </td>
+                                    <td class="align-middle">
+                                        <span class="badge bg-info-subtle text-info">
+                                            {{ programa.categoria_programa?.nombre || 'N/A' }}
+                                        </span>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                        <div class="form-check form-switch d-inline-block">
+                                            <input class="form-check-input" type="checkbox" role="switch"
+                                                [checked]="programa.tienePermiso" (change)="togglePermiso(programa)"
+                                                [disabled]="guardando">
+                                        </div>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                        <div class="form-check d-inline-block">
+                                            <input class="form-check-input" type="checkbox"
+                                                [(ngModel)]="programa.acceso_lectura"
+                                                (change)="actualizarAcceso(programa, 'lectura')"
+                                                [disabled]="!programa.tienePermiso || guardando">
+                                        </div>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                        <div class="form-check d-inline-block">
+                                            <input class="form-check-input" type="checkbox"
+                                                [(ngModel)]="programa.acceso_escritura"
+                                                (change)="actualizarAcceso(programa, 'escritura')"
+                                                [disabled]="!programa.tienePermiso || guardando">
+                                        </div>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                        <div class="form-check d-inline-block">
+                                            <input class="form-check-input" type="checkbox"
+                                                [(ngModel)]="programa.acceso_eliminacion"
+                                                (change)="actualizarAcceso(programa, 'eliminacion')"
+                                                [disabled]="!programa.tienePermiso || guardando">
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginación -->
+                    <div *ngIf="rolSeleccionado && programasFiltrados.length > 0"
+                        class="card-footer bg-white border-top">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <small class="text-muted">
+                                    Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }} a
+                                    {{ Math.min(currentPage * itemsPerPage, programasFiltrados.length) }}
+                                    de {{ programasFiltrados.length }} programas
+                                </small>
+                            </div>
+                            <div class="col-md-6">
+                                <nav aria-label="Paginación">
+                                    <ul class="pagination pagination-sm justify-content-md-end mb-0">
+                                        <li class="page-item" [class.disabled]="currentPage === 1">
+                                            <a class="page-link" (click)="cambiarPagina(currentPage - 1)"
+                                                href="javascript:void(0)">
+                                                <i class="fas fa-chevron-left"></i>
+                                            </a>
+                                        </li>
+                                        <li class="page-item" *ngFor="let page of pages"
+                                            [class.active]="page === currentPage" [class.disabled]="page === -1">
+                                            <a class="page-link" (click)="page !== -1 ? cambiarPagina(page) : null"
+                                                [style.cursor]="page === -1 ? 'default' : 'pointer'"
+                                                href="javascript:void(0)">
+                                                {{ page === -1 ? '...' : page }}
+                                            </a>
+                                        </li>
+                                        <li class="page-item" [class.disabled]="currentPage === totalPages">
+                                            <a class="page-link" (click)="cambiarPagina(currentPage + 1)"
+                                                href="javascript:void(0)">
+                                                <i class="fas fa-chevron-right"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

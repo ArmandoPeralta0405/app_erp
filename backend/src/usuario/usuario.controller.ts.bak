@@ -1,0 +1,73 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Delete,
+  ValidationPipe,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
+import { UsuarioService } from './usuario.service';
+// 💡 Importar DTOs
+import { CreateUsuarioDto } from './dto/create_usuario.dto';
+import { UpdateUsuarioDto } from './dto/update_usuario.dto';
+import { AuthGuard } from '@nestjs/passport'; // 💡 Importar AuthGuard
+
+@UseGuards(AuthGuard('jwt'))
+@Controller('usuario')
+export class UsuarioController {
+  constructor(private readonly usuarioService: UsuarioService) { }
+
+  // 1. OBTENER TODOS LOS USUARIOS (GET /usuario)
+  // Retorna una lista de usuarios sin la clave
+  @Get()
+  async findAll() {
+    return this.usuarioService.findAll();
+  }
+
+  // 2. OBTENER PROGRAMAS DEL USUARIO AUTENTICADO (GET /usuario/me/programas)
+  @Get('me/programas')
+  async getMyProgramas(@Request() req) {
+    return this.usuarioService.getProgramasForUser(req.user.id);
+  }
+
+  // 3. OBTENER UN USUARIO POR ID (GET /usuario/1)
+  // Retorna el modelo completo (incluyendo clave) para su uso interno,
+  // aunque se debe manejar la exposición en producción si es necesario.
+  @Get(':id')
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.usuarioService.findOne(id);
+  }
+
+  // 4. CREAR UN NUEVO USUARIO (POST /usuario)
+  @Post()
+  async create(
+    // 💡 Aplicamos ValidationPipe para validar CreateUsuarioDto
+    @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+    createUsuarioDto: CreateUsuarioDto,
+  ) {
+    return this.usuarioService.create(createUsuarioDto);
+  }
+
+  // 5. ACTUALIZAR UN USUARIO (PATCH /usuario/1)
+  @Patch(':id')
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    // 💡 Aplicamos ValidationPipe para validar UpdateUsuarioDto
+    @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+    updateUsuarioDto: UpdateUsuarioDto,
+  ) {
+    return this.usuarioService.update(id, updateUsuarioDto);
+  }
+
+  // 6. ELIMINACIÓN LÓGICA (DELETE /usuario/1)
+  @Delete(':id')
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    // El servicio maneja la excepción NotFoundException si no existe el ID
+    return this.usuarioService.remove(id);
+  }
+}

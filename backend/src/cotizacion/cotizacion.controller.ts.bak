@@ -1,0 +1,56 @@
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ValidationPipe, ParseIntPipe } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { CotizacionService } from './cotizacion.service';
+import { CreateCotizacionDto } from './dto/create-cotizacion.dto';
+import { UpdateCotizacionDto } from './dto/update-cotizacion.dto';
+
+@UseGuards(AuthGuard('jwt'))
+@Controller('cotizacion')
+export class CotizacionController {
+    constructor(private readonly cotizacionService: CotizacionService) { }
+
+    @Get()
+    findAll() {
+        return this.cotizacionService.findAll();
+    }
+
+    @Get('moneda/:id_moneda')
+    findByMoneda(@Param('id_moneda', ParseIntPipe) id_moneda: number) {
+        return this.cotizacionService.findByMoneda(id_moneda);
+    }
+
+    @Get('fecha/:fecha')
+    findByFecha(@Param('fecha') fecha: string) {
+        return this.cotizacionService.findByFecha(fecha);
+    }
+
+    @Get(':id_moneda/:fecha')
+    findOne(
+        @Param('id_moneda', ParseIntPipe) id_moneda: number,
+        @Param('fecha') fecha: string
+    ) {
+        return this.cotizacionService.findOne(id_moneda, fecha);
+    }
+
+    @Post()
+    create(@Body(ValidationPipe) createCotizacionDto: CreateCotizacionDto) {
+        return this.cotizacionService.create(createCotizacionDto);
+    }
+
+    @Patch(':id_moneda/:fecha')
+    update(
+        @Param('id_moneda', ParseIntPipe) id_moneda: number,
+        @Param('fecha') fecha: string,
+        @Body(ValidationPipe) updateCotizacionDto: UpdateCotizacionDto
+    ) {
+        return this.cotizacionService.update(id_moneda, fecha, updateCotizacionDto);
+    }
+
+    @Delete(':id_moneda/:fecha')
+    remove(
+        @Param('id_moneda', ParseIntPipe) id_moneda: number,
+        @Param('fecha') fecha: string
+    ) {
+        return this.cotizacionService.remove(id_moneda, fecha);
+    }
+}

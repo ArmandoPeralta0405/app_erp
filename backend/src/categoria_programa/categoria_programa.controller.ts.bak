@@ -1,0 +1,60 @@
+// src/categoria_programa/categoria_programa.controller.ts
+
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Delete,
+  ValidationPipe,
+  UseGuards, // 💡 Importar UseGuards
+} from '@nestjs/common';
+import { CategoriaProgramaService } from './categoria_programa.service';
+import { CreateCategoriaProgramaDto } from './dto/create_categoria_programa.dto';
+import { UpdateCategoriaProgramaDto } from './dto/update_categoria_programa.dto';
+import { AuthGuard } from '@nestjs/passport'; // 💡 Importar AuthGuard
+
+// 🚀 Aplicamos el AuthGuard('jwt') a NIVEL DE CLASE
+// Esto protegerá TODAS las rutas (Get, Post, Patch, Delete)
+@UseGuards(AuthGuard('jwt'))
+@Controller('categoria_programa')
+export class CategoriaProgramaController {
+  constructor(
+    private readonly categoriaProgramaService: CategoriaProgramaService,
+  ) {} // 1. OBTENER TODAS (Protegida)
+
+  @Get()
+  async findAll() {
+    return this.categoriaProgramaService.findAll();
+  } // 2. OBTENER UNA POR ID (Protegida)
+
+  @Get(':id')
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.categoriaProgramaService.findOne(id);
+  } // 3. CREAR UNA NUEVA CATEGORÍA (Protegida)
+
+  @Post()
+  async create(
+    @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+    createCategoriaProgramaDto: CreateCategoriaProgramaDto,
+  ) {
+    return this.categoriaProgramaService.create(createCategoriaProgramaDto);
+  } // 4. ACTUALIZAR UNA CATEGORÍA (Protegida)
+
+  @Patch(':id')
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+    updateCategoriaProgramaDto: UpdateCategoriaProgramaDto,
+  ) {
+    return this.categoriaProgramaService.update(id, updateCategoriaProgramaDto);
+  } // 5. ELIMINACIÓN LÓGICA (Protegida)
+
+  @Delete(':id')
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return this.categoriaProgramaService.remove(id);
+  }
+}
