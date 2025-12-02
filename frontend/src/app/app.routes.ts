@@ -15,6 +15,7 @@ import { Sucursales } from './components/main/sistemas/administracion/sucursales
 import { Depositos } from './components/main/sistemas/administracion/depositos/depositos';
 import { PermisosRolProgramaComponent } from './components/main/sistemas/administracion/permisos-rol-programa/permisos-rol-programa';
 import { ImpuestoComponent } from './components/main/sistemas/administracion/impuesto/impuesto.component';
+import { ClaseDocumentoComponent } from './components/main/sistemas/administracion/clases-documento/clase-documento.component';
 import { CotizacionComponent } from './components/main/finanzas/mantenimientos/cotizacion/cotizacion.component';
 import { MarcaComponent } from './components/main/inventarios/mantenimientos/marca/marca.component';
 import { LineaComponent } from './components/main/inventarios/mantenimientos/linea/linea.component';
@@ -27,7 +28,8 @@ import { CiudadComponent } from './components/main/finanzas/mantenimientos/ciuda
 import { ClienteComponent } from './components/main/finanzas/mantenimientos/cliente/cliente.component';
 import { ProveedorComponent } from './components/main/finanzas/mantenimientos/proveedor/proveedor.component';
 import { MotivoAjusteInventarioComponent } from './components/main/inventarios/mantenimientos/motivo-ajuste-inventario/motivo-ajuste-inventario.component';
-
+import { TipoTransaccionComponent } from './components/main/sistemas/administracion/tipo-transaccion/tipo-transaccion.component';
+import { ConfiguracionSistemaComponent } from './components/main/sistemas/administracion/configuracion-sistema/configuracion-sistema.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -51,6 +53,9 @@ export const routes: Routes = [
             { path: 'sistemas/administracion/depositos', component: Depositos },
             { path: 'sistemas/administracion/permisos-rol-programa', component: PermisosRolProgramaComponent },
             { path: 'sistemas/administracion/impuestos', component: ImpuestoComponent },
+            { path: 'sistemas/administracion/clases-documentos', component: ClaseDocumentoComponent },
+            { path: 'sistemas/administracion/tipos-transacciones', component: TipoTransaccionComponent },
+            { path: 'sistemas/administracion/configuracion-sistema', component: ConfiguracionSistemaComponent },
             { path: 'finanzas/mantenimientos/cotizaciones', component: CotizacionComponent },
             { path: 'inventarios/mantenimientos/marcas', component: MarcaComponent },
             { path: 'inventarios/mantenimientos/lineas', component: LineaComponent },

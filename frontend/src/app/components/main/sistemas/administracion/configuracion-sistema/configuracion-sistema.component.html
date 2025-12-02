@@ -1,0 +1,271 @@
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4 class="mb-1 fw-bold text-dark">
+                <i class="fas fa-cogs text-primary me-2"></i>
+                Configuración del Sistema
+            </h4>
+            <p class="text-muted small mb-0">Define los parámetros y valores por defecto del sistema</p>
+        </div>
+    </div>
+
+    <!-- Barra de búsqueda y botón nuevo -->
+    <div class="row mb-3">
+        <div class="col-md-8">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+                <input type="text" class="form-control border-start-0"
+                    placeholder="Buscar por ID o tipo de transacción..." [(ngModel)]="searchTerm"
+                    (ngModelChange)="filtrar()">
+            </div>
+        </div>
+        <div class="col-md-4 text-end">
+            <button class="btn btn-primary" (click)="abrirFormularioNuevo()" [disabled]="!canWrite">
+                <i class="fas fa-plus me-2"></i>
+                Nueva Configuración
+            </button>
+        </div>
+    </div>
+
+    <!-- Tabla de datos -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <div *ngIf="loading" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                        <p class="text-muted mt-2">Cargando datos...</p>
+                    </div>
+
+                    <div *ngIf="!loading" class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="border-0">ID</th>
+                                    <th class="border-0">Ajuste (+)</th>
+                                    <th class="border-0">Ajuste (-)</th>
+                                    <th class="border-0">Fact. Contado Emit.</th>
+                                    <th class="border-0">Fact. Contado Rec.</th>
+                                    <th class="border-0 text-center">Estado</th>
+                                    <th class="border-0 text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngIf="filteredConfiguraciones.length === 0">
+                                    <td colspan="7" class="text-center text-muted py-5">
+                                        <i class="fas fa-inbox fa-3x mb-3 d-block text-muted opacity-50"></i>
+                                        <p class="mb-0">{{ searchTerm ? 'No se encontraron resultados' : 'No hay
+                                            configuraciones definidas' }}</p>
+                                    </td>
+                                </tr>
+                                <tr *ngFor="let item of filteredConfiguraciones">
+                                    <td class="align-middle">
+                                        <span class="badge bg-light text-dark">{{ item.id_configuracion_sistema
+                                            }}</span>
+                                    </td>
+                                    <td class="align-middle">{{
+                                        getNombreTipo(item.tipo_transaccion_configuracion_sistema_id_tipo_transaccion_ajuste_positivoTotipo_transaccion)
+                                        }}</td>
+                                    <td class="align-middle">{{
+                                        getNombreTipo(item.tipo_transaccion_configuracion_sistema_id_tipo_transaccion_ajuste_negativoTotipo_transaccion)
+                                        }}</td>
+                                    <td class="align-middle">{{
+                                        getNombreTipo(item.tipo_transaccion_configuracion_sistema_id_tipo_transaccion_factura_contado_emitidaTotipo_transaccion)
+                                        }}</td>
+                                    <td class="align-middle">{{
+                                        getNombreTipo(item.tipo_transaccion_configuracion_sistema_id_tipo_transaccion_factura_contado_recibidaTotipo_transaccion)
+                                        }}</td>
+                                    <td class="align-middle text-center">
+                                        <i class="fas"
+                                            [ngClass]="item.estado ? 'fa-check text-success' : 'fa-times text-muted'"></i>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <button class="btn btn-outline-primary"
+                                                (click)="abrirFormularioEditar(item)" [disabled]="!canWrite"
+                                                title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger" (click)="eliminar(item)"
+                                                [disabled]="!canDelete" title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de formulario -->
+<div class="modal" [class.show]="showForm" [style.display]="showForm ? 'block' : 'none'" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-cogs me-2"></i>
+                    {{ isEditing ? 'Editar Configuración' : 'Nueva Configuración' }}
+                </h5>
+                <button type="button" class="btn-close" (click)="cerrarFormulario()"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <h6 class="text-primary border-bottom pb-2">Ajustes de Inventario</h6>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Ajuste Positivo (Entrada)</label>
+                            <select class="form-select" [(ngModel)]="formData.id_tipo_transaccion_ajuste_positivo"
+                                name="ajuste_pos">
+                                <option [ngValue]="undefined">Seleccione...</option>
+                                <option *ngFor="let tipo of tiposTransaccion" [value]="tipo.id_tipo_transaccion">
+                                    {{ tipo.nombre }} ({{ tipo.tipo }})
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Ajuste Negativo (Salida)</label>
+                            <select class="form-select" [(ngModel)]="formData.id_tipo_transaccion_ajuste_negativo"
+                                name="ajuste_neg">
+                                <option [ngValue]="undefined">Seleccione...</option>
+                                <option *ngFor="let tipo of tiposTransaccion" [value]="tipo.id_tipo_transaccion">
+                                    {{ tipo.nombre }} ({{ tipo.tipo }})
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 mb-3 mt-2">
+                            <h6 class="text-primary border-bottom pb-2">Facturación (Contado)</h6>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Factura Contado Emitida</label>
+                            <select class="form-select"
+                                [(ngModel)]="formData.id_tipo_transaccion_factura_contado_emitida"
+                                name="fact_cont_emit">
+                                <option [ngValue]="undefined">Seleccione...</option>
+                                <option *ngFor="let tipo of tiposTransaccion" [value]="tipo.id_tipo_transaccion">
+                                    {{ tipo.nombre }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Factura Contado Recibida</label>
+                            <select class="form-select"
+                                [(ngModel)]="formData.id_tipo_transaccion_factura_contado_recibida"
+                                name="fact_cont_rec">
+                                <option [ngValue]="undefined">Seleccione...</option>
+                                <option *ngFor="let tipo of tiposTransaccion" [value]="tipo.id_tipo_transaccion">
+                                    {{ tipo.nombre }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 mb-3 mt-2">
+                            <h6 class="text-primary border-bottom pb-2">Facturación (Crédito)</h6>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Factura Crédito Emitida</label>
+                            <select class="form-select"
+                                [(ngModel)]="formData.id_tipo_transaccion_factura_credito_emitida"
+                                name="fact_cred_emit">
+                                <option [ngValue]="undefined">Seleccione...</option>
+                                <option *ngFor="let tipo of tiposTransaccion" [value]="tipo.id_tipo_transaccion">
+                                    {{ tipo.nombre }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Factura Crédito Recibida</label>
+                            <select class="form-select"
+                                [(ngModel)]="formData.id_tipo_transaccion_factura_credito_recibida"
+                                name="fact_cred_rec">
+                                <option [ngValue]="undefined">Seleccione...</option>
+                                <option *ngFor="let tipo of tiposTransaccion" [value]="tipo.id_tipo_transaccion">
+                                    {{ tipo.nombre }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 mb-3 mt-2">
+                            <h6 class="text-primary border-bottom pb-2">Notas de Crédito</h6>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nota Crédito Emitida</label>
+                            <select class="form-select" [(ngModel)]="formData.id_tipo_transaccion_nota_credito_emitida"
+                                name="nc_emit">
+                                <option [ngValue]="undefined">Seleccione...</option>
+                                <option *ngFor="let tipo of tiposTransaccion" [value]="tipo.id_tipo_transaccion">
+                                    {{ tipo.nombre }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nota Crédito Recibida</label>
+                            <select class="form-select" [(ngModel)]="formData.id_tipo_transaccion_nota_credito_recibida"
+                                name="nc_rec">
+                                <option [ngValue]="undefined">Seleccione...</option>
+                                <option *ngFor="let tipo of tiposTransaccion" [value]="tipo.id_tipo_transaccion">
+                                    {{ tipo.nombre }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 mb-3 mt-2">
+                            <h6 class="text-primary border-bottom pb-2">Remisiones</h6>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Remisión Emitida</label>
+                            <select class="form-select" [(ngModel)]="formData.id_tipo_transaccion_remision_emitida"
+                                name="rem_emit">
+                                <option [ngValue]="undefined">Seleccione...</option>
+                                <option *ngFor="let tipo of tiposTransaccion" [value]="tipo.id_tipo_transaccion">
+                                    {{ tipo.nombre }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Remisión Recibida</label>
+                            <select class="form-select" [(ngModel)]="formData.id_tipo_transaccion_remision_recibida"
+                                name="rem_rec">
+                                <option [ngValue]="undefined">Seleccione...</option>
+                                <option *ngFor="let tipo of tiposTransaccion" [value]="tipo.id_tipo_transaccion">
+                                    {{ tipo.nombre }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Estado -->
+                        <div class="col-md-12 mb-3 mt-2">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="estado"
+                                    [(ngModel)]="formData.estado" name="estado">
+                                <label class="form-check-label" for="estado">Activo</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="cerrarFormulario()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" (click)="guardar()">
+                    <i class="fas fa-save me-2"></i>
+                    {{ isEditing ? 'Actualizar' : 'Guardar' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-backdrop fade" [class.show]="showForm" *ngIf="showForm"></div>

@@ -1,3 +1,4 @@
+
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -18,7 +19,8 @@ import { ImpuestoModule } from './impuesto/impuesto.module';
 import { CotizacionModule } from './cotizacion/cotizacion.module';
 import { MarcaModule } from './marca/marca.module';
 import { LineaModule } from './linea/linea.module';
-import { Tipo_articuloModule } from './linea copy/tipo_articulo.module';
+import { ClaseDocumentoModule } from './clase_documento/clase_documento.module';
+import { Tipo_articuloModule } from './tipo_articulo/tipo_articulo.module';
 import { UnidadMedidaModule } from './unidad_medida/unidad_medida.module';
 import { ArticuloModule } from './articulo/articulo.module';
 import { ArticuloCodigoBarraModule } from './articulo_codigo_barra/articulo_codigo_barra.module';
@@ -28,7 +30,8 @@ import { CiudadModule } from './ciudad/ciudad.module';
 import { ClienteModule } from './cliente/cliente.module';
 import { ProveedorModule } from './proveedor/proveedor.module';
 import { MotivoAjusteInventarioModule } from './motivo-ajuste-inventario/motivo-ajuste-inventario.module';
-
+import { TipoTransaccionModule } from './tipo_transaccion/tipo_transaccion.module';
+import { ConfiguracionSistemaModule } from './configuracion_sistema/configuracion_sistema.module';
 
 @Module({
   imports: [
@@ -59,6 +62,9 @@ import { MotivoAjusteInventarioModule } from './motivo-ajuste-inventario/motivo-
     ClienteModule,
     ProveedorModule,
     MotivoAjusteInventarioModule,
+    TipoTransaccionModule,
+    ClaseDocumentoModule,
+    ConfiguracionSistemaModule,
   ],
 
   controllers: [AppController],
