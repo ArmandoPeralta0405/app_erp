@@ -32,6 +32,9 @@ import { ProveedorModule } from './proveedor/proveedor.module';
 import { MotivoAjusteInventarioModule } from './motivo-ajuste-inventario/motivo-ajuste-inventario.module';
 import { TipoTransaccionModule } from './tipo_transaccion/tipo_transaccion.module';
 import { ConfiguracionSistemaModule } from './configuracion_sistema/configuracion_sistema.module';
+import { UsuarioConfiguracionSistemaModule } from './usuario_configuracion_sistema/usuario_configuracion_sistema.module';
+import { TerminalModule } from './terminal/terminal.module';
+import { UsuarioTerminalModule } from './usuario_terminal/usuario_terminal.module';
 
 @Module({
   imports: [
@@ -65,6 +68,9 @@ import { ConfiguracionSistemaModule } from './configuracion_sistema/configuracio
     TipoTransaccionModule,
     ClaseDocumentoModule,
     ConfiguracionSistemaModule,
+    UsuarioConfiguracionSistemaModule,
+    TerminalModule,
+    UsuarioTerminalModule,
   ],
 
   controllers: [AppController],

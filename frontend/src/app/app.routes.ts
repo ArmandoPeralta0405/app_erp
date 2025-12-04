@@ -30,6 +30,7 @@ import { ProveedorComponent } from './components/main/finanzas/mantenimientos/pr
 import { MotivoAjusteInventarioComponent } from './components/main/inventarios/mantenimientos/motivo-ajuste-inventario/motivo-ajuste-inventario.component';
 import { TipoTransaccionComponent } from './components/main/sistemas/administracion/tipo-transaccion/tipo-transaccion.component';
 import { ConfiguracionSistemaComponent } from './components/main/sistemas/administracion/configuracion-sistema/configuracion-sistema.component';
+import { TerminalComponent } from './components/main/sistemas/administracion/terminal/terminal.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -56,6 +57,7 @@ export const routes: Routes = [
             { path: 'sistemas/administracion/clases-documentos', component: ClaseDocumentoComponent },
             { path: 'sistemas/administracion/tipos-transacciones', component: TipoTransaccionComponent },
             { path: 'sistemas/administracion/configuracion-sistema', component: ConfiguracionSistemaComponent },
+            { path: 'sistemas/administracion/terminales', component: TerminalComponent },
             { path: 'finanzas/mantenimientos/cotizaciones', component: CotizacionComponent },
             { path: 'inventarios/mantenimientos/marcas', component: MarcaComponent },
             { path: 'inventarios/mantenimientos/lineas', component: LineaComponent },
@@ -68,6 +70,7 @@ export const routes: Routes = [
             { path: 'finanzas/mantenimientos/clientes', component: ClienteComponent },
             { path: 'finanzas/mantenimientos/proveedores', component: ProveedorComponent },
             { path: 'inventarios/mantenimientos/motivos-ajustes', component: MotivoAjusteInventarioComponent },
+
         ],
 
     },

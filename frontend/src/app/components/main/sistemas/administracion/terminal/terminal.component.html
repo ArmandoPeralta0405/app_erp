@@ -1,0 +1,307 @@
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <h4 class="mb-1 fw-bold text-dark">
+        <i class="fas fa-desktop text-primary me-2"></i>
+        Gestión de Terminales
+      </h4>
+      <p class="text-muted small mb-0">Administra las terminales de facturación del sistema</p>
+    </div>
+  </div>
+
+  <!-- Buscador y botón nuevo -->
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <div class="input-group">
+        <span class="input-group-text bg-white">
+          <i class="fas fa-search text-muted"></i>
+        </span>
+        <input type="text" class="form-control" placeholder="Buscar por nombre u observación..."
+          [(ngModel)]="searchTerm" (input)="onSearch()">
+      </div>
+    </div>
+    <div class="col-md-6 text-end">
+      <button class="btn btn-primary" (click)="abrirFormularioNuevo()" [disabled]="!canWrite">
+        <i class="fas fa-plus me-2"></i>
+        Nueva Terminal
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabla de terminales -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+          <div *ngIf="loading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="text-muted mt-2">Cargando terminales...</p>
+          </div>
+
+          <div *ngIf="!loading" class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="border-0">ID</th>
+                  <th class="border-0">Nombre</th>
+                  <th class="border-0 text-center">Límite Items</th>
+                  <th class="border-0 text-center">Últ. Factura</th>
+                  <th class="border-0 text-center">Últ. NC</th>
+                  <th class="border-0 text-center">Últ. Remisión</th>
+                  <th class="border-0 text-center">Usuarios</th>
+                  <th class="border-0 text-center">Estado</th>
+                  <th class="border-0 text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngIf="terminalesFiltrados.length === 0">
+                  <td colspan="9" class="text-center text-muted py-5">
+                    <i class="fas fa-inbox fa-3x mb-3 d-block text-muted opacity-50"></i>
+                    <p class="mb-0">{{ searchTerm ? 'No se encontraron resultados' : 'No hay terminales registradas' }}
+                    </p>
+                  </td>
+                </tr>
+                <tr *ngFor="let terminal of terminalesPaginados">
+                  <td class="align-middle" data-label="ID">
+                    <span class="badge bg-light text-dark">{{ terminal.id_terminal }}</span>
+                  </td>
+                  <td class="align-middle" data-label="Nombre">
+                    <strong>{{ terminal.nombre }}</strong>
+                    <div *ngIf="terminal.observacion" class="text-muted small">
+                      {{ terminal.observacion }}
+                    </div>
+                  </td>
+                  <td class="align-middle text-center" data-label="Límite Items">
+                    {{ terminal.limite_items || 15 }}
+                  </td>
+                  <td class="align-middle text-center" data-label="Últ. Factura">
+                    <span class="badge bg-info font-monospace">{{
+                      formatearNumeroDocumento(terminal.ultimo_numero_factura || 0) }}</span>
+                  </td>
+                  <td class="align-middle text-center" data-label="Últ. NC">
+                    <span class="badge bg-secondary font-monospace">{{
+                      formatearNumeroDocumento(terminal.ultimo_numero_nota_credito || 0) }}</span>
+                  </td>
+                  <td class="align-middle text-center" data-label="Últ. Remisión">
+                    <span class="badge bg-secondary font-monospace">{{
+                      formatearNumeroDocumento(terminal.ultimo_numero_remision || 0) }}</span>
+                  </td>
+                  <td class="align-middle text-center" data-label="Usuarios">
+                    <span class="badge bg-primary">{{ getUsuariosAsignados(terminal) }}</span>
+                  </td>
+                  <td class="align-middle text-center" data-label="Estado">
+                    <span *ngIf="terminal.estado" class="badge bg-success">Activo</span>
+                    <span *ngIf="!terminal.estado" class="badge bg-danger">Inactivo</span>
+                  </td>
+                  <td class="align-middle text-center">
+                    <div class="btn-group btn-group-sm" role="group">
+                      <button class="btn btn-outline-primary" (click)="abrirFormularioEditar(terminal)"
+                        [disabled]="!canWrite" title="Editar">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="btn btn-outline-danger" (click)="eliminarTerminal(terminal)"
+                        [disabled]="!canDelete" title="Desactivar">
+                        <i class="fas fa-ban"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Paginación -->
+          <div *ngIf="!loading && terminalesFiltrados.length > 0" class="card-footer bg-white border-top">
+            <div class="row align-items-center">
+              <div class="col-md-6">
+                <small class="text-muted">
+                  Página {{ currentPage }} de {{ totalPages }}
+                </small>
+              </div>
+              <div class="col-md-6">
+                <nav aria-label="Paginación">
+                  <ul class="pagination pagination-sm justify-content-md-end mb-0">
+                    <li class="page-item" [class.disabled]="currentPage === 1">
+                      <a class="page-link" (click)="cambiarPagina(currentPage - 1)" href="javascript:void(0)">
+                        <i class="fas fa-chevron-left"></i>
+                      </a>
+                    </li>
+                    <li class="page-item" *ngFor="let page of pages" [class.active]="page === currentPage"
+                      [class.disabled]="page === -1">
+                      <a class="page-link" (click)="page !== -1 ? cambiarPagina(page) : null"
+                        [style.cursor]="page === -1 ? 'default' : 'pointer'" href="javascript:void(0)">
+                        {{ page === -1 ? '...' : page }}
+                      </a>
+                    </li>
+                    <li class="page-item" [class.disabled]="currentPage === totalPages">
+                      <a class="page-link" (click)="cambiarPagina(currentPage + 1)" href="javascript:void(0)">
+                        <i class="fas fa-chevron-right"></i>
+                      </a>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de formulario -->
+<div class="modal" [class.show]="showForm" [style.display]="showForm ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-desktop me-2"></i>
+          {{ isEditing ? 'Editar Terminal' : 'Nueva Terminal' }}
+        </h5>
+        <button type="button" class="btn-close" (click)="cerrarFormulario()"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="row">
+            <div class="col-md-8 mb-3">
+              <label class="form-label">Nombre <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" [(ngModel)]="formData.nombre" name="nombre"
+                placeholder="Ej: Caja Principal, Terminal 001" maxlength="150" required>
+              <small class="text-muted">Máximo 150 caracteres</small>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Límite de Items</label>
+              <input type="number" class="form-control" [(ngModel)]="formData.limite_items" name="limite_items"
+                placeholder="15" min="1">
+              <small class="text-muted">Items por factura</small>
+            </div>
+          </div>
+
+          <!-- Último Nº Factura -->
+          <div class="mb-3">
+            <label class="form-label">Último Nº Factura</label>
+            <div class="row g-2 align-items-center">
+              <div class="col-auto">
+                <input type="text" class="form-control text-center font-monospace" style="width: 70px;"
+                  [(ngModel)]="facturaEstablecimiento" name="facturaEstablecimiento" (input)="onNumeroChange('factura')"
+                  maxlength="3" placeholder="001">
+              </div>
+              <div class="col-auto">
+                <span class="text-muted fw-bold">-</span>
+              </div>
+              <div class="col-auto">
+                <input type="text" class="form-control text-center font-monospace" style="width: 70px;"
+                  [(ngModel)]="facturaPuntoExpedicion" name="facturaPuntoExpedicion" (input)="onNumeroChange('factura')"
+                  maxlength="3" placeholder="001">
+              </div>
+              <div class="col-auto">
+                <span class="text-muted fw-bold">-</span>
+              </div>
+              <div class="col-auto">
+                <input type="text" class="form-control text-center font-monospace" style="width: 110px;"
+                  [(ngModel)]="facturaSecuencia" name="facturaSecuencia" (input)="onNumeroChange('factura')"
+                  maxlength="7" placeholder="0000000">
+              </div>
+              <div class="col-auto">
+                <span class="badge bg-info font-monospace">{{ getPreview('factura') }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Último Nº Nota Crédito -->
+          <div class="mb-3">
+            <label class="form-label">Último Nº Nota Crédito</label>
+            <div class="row g-2 align-items-center">
+              <div class="col-auto">
+                <input type="text" class="form-control text-center font-monospace" style="width: 70px;"
+                  [(ngModel)]="notaCreditoEstablecimiento" name="notaCreditoEstablecimiento"
+                  (input)="onNumeroChange('notaCredito')" maxlength="3" placeholder="001">
+              </div>
+              <div class="col-auto">
+                <span class="text-muted fw-bold">-</span>
+              </div>
+              <div class="col-auto">
+                <input type="text" class="form-control text-center font-monospace" style="width: 70px;"
+                  [(ngModel)]="notaCreditoPuntoExpedicion" name="notaCreditoPuntoExpedicion"
+                  (input)="onNumeroChange('notaCredito')" maxlength="3" placeholder="001">
+              </div>
+              <div class="col-auto">
+                <span class="text-muted fw-bold">-</span>
+              </div>
+              <div class="col-auto">
+                <input type="text" class="form-control text-center font-monospace" style="width: 110px;"
+                  [(ngModel)]="notaCreditoSecuencia" name="notaCreditoSecuencia" (input)="onNumeroChange('notaCredito')"
+                  maxlength="7" placeholder="0000000">
+              </div>
+              <div class="col-auto">
+                <span class="badge bg-secondary font-monospace">{{ getPreview('notaCredito') }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Último Nº Remisión -->
+          <div class="mb-3">
+            <label class="form-label">Último Nº Remisión</label>
+            <div class="row g-2 align-items-center">
+              <div class="col-auto">
+                <input type="text" class="form-control text-center font-monospace" style="width: 70px;"
+                  [(ngModel)]="remisionEstablecimiento" name="remisionEstablecimiento"
+                  (input)="onNumeroChange('remision')" maxlength="3" placeholder="001">
+              </div>
+              <div class="col-auto">
+                <span class="text-muted fw-bold">-</span>
+              </div>
+              <div class="col-auto">
+                <input type="text" class="form-control text-center font-monospace" style="width: 70px;"
+                  [(ngModel)]="remisionPuntoExpedicion" name="remisionPuntoExpedicion"
+                  (input)="onNumeroChange('remision')" maxlength="3" placeholder="001">
+              </div>
+              <div class="col-auto">
+                <span class="text-muted fw-bold">-</span>
+              </div>
+              <div class="col-auto">
+                <input type="text" class="form-control text-center font-monospace" style="width: 110px;"
+                  [(ngModel)]="remisionSecuencia" name="remisionSecuencia" (input)="onNumeroChange('remision')"
+                  maxlength="7" placeholder="0000000">
+              </div>
+              <div class="col-auto">
+                <span class="badge bg-secondary font-monospace">{{ getPreview('remision') }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12 mb-3">
+              <label class="form-label">Observación</label>
+              <textarea class="form-control" [(ngModel)]="formData.observacion" name="observacion" rows="2"
+                placeholder="Observaciones adicionales..." maxlength="250"></textarea>
+              <small class="text-muted">Máximo 250 caracteres (opcional)</small>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="estadoSwitch" [(ngModel)]="formData.estado"
+                  name="estado">
+                <label class="form-check-label" for="estadoSwitch">Activo</label>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cerrarFormulario()">
+          Cancelar
+        </button>
+        <button type="button" class="btn btn-primary" (click)="guardarTerminal()">
+          <i class="fas fa-save me-2"></i>
+          {{ isEditing ? 'Actualizar' : 'Guardar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade" [class.show]="showForm" *ngIf="showForm"></div>

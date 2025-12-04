@@ -1,12 +1,130 @@
-.navbar {
-    height: 70px;
+/* Estilos para el header */
+
+/* Modal de configuración */
+.modal {
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
 }
 
-#menu-toggle {
-    background-color: #003366;
+.modal.show {
+    display: flex !important;
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.5);
+    pointer-events: all;
+}
+
+.modal-dialog {
+    margin: 1rem;
+    transform: scale(0.7);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-width: 600px;
+    width: 95%;
+}
+
+.modal.show .modal-dialog {
+    transform: scale(1);
+}
+
+.modal-content {
+    border-radius: 16px;
     border: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
 }
 
-#menu-toggle:hover {
+.modal-header {
+    background: linear-gradient(135deg, #003366 0%, #004080 100%);
+    color: white;
+    border-bottom: none;
+    padding: 1.5rem;
+    border-radius: 16px 16px 0 0;
+}
+
+.modal-header .modal-title {
+    color: white;
+    font-weight: 600;
+}
+
+.modal-header .btn-close {
+    filter: brightness(0) invert(1);
+    opacity: 0.8;
+}
+
+.modal-header .btn-close:hover {
+    opacity: 1;
+}
+
+.modal-body {
+    padding: 1.5rem;
+    max-height: 75vh;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+    border-radius: 0 0 16px 16px;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.form-control,
+.form-select {
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.9rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #003366;
+    box-shadow: 0 0 0 0.2rem rgba(0, 51, 102, 0.15);
+}
+
+/* Botones */
+.btn-primary {
+    background-color: #003366;
+    border-color: #003366;
+    font-weight: 500;
+}
+
+.btn-primary:hover {
     background-color: #002244;
+    border-color: #002244;
+}
+
+.btn-primary:disabled {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+/* Alertas */
+.alert {
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+/* Secciones */
+h6.text-primary {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+/* Backdrop */
+.modal-backdrop {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal-backdrop.show {
+    opacity: 0.5;
 }

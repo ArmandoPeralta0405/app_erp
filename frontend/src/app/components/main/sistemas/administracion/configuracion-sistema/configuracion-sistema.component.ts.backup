@@ -118,7 +118,6 @@ export class ConfiguracionSistemaComponent implements OnInit {
         this.isEditing = true;
         this.currentId = item.id_configuracion_sistema;
         this.formData = {
-            descripcion: item.descripcion,
             id_tipo_transaccion_ajuste_positivo: item.id_tipo_transaccion_ajuste_positivo,
             id_tipo_transaccion_ajuste_negativo: item.id_tipo_transaccion_ajuste_negativo,
             id_tipo_transaccion_factura_contado_emitida: item.id_tipo_transaccion_factura_contado_emitida,

@@ -1,6 +1,10 @@
-import { IsBoolean, IsInt, IsOptional } from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class CreateConfiguracionSistemaDto {
+    @IsString()
+    @IsOptional()
+    descripcion?: string;
+
     @IsInt()
     @IsOptional()
     id_tipo_transaccion_ajuste_positivo?: number;

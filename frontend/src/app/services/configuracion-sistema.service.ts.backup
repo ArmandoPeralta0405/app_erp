@@ -6,7 +6,6 @@ import { TipoTransaccion } from './tipo-transaccion.service';
 
 export interface ConfiguracionSistema {
     id_configuracion_sistema: number;
-    descripcion?: string;
     id_tipo_transaccion_ajuste_positivo?: number;
     id_tipo_transaccion_ajuste_negativo?: number;
     id_tipo_transaccion_factura_contado_emitida?: number;
@@ -31,7 +30,6 @@ export interface ConfiguracionSistema {
 }
 
 export interface CreateConfiguracionSistemaDto {
-    descripcion?: string;
     id_tipo_transaccion_ajuste_positivo?: number;
     id_tipo_transaccion_ajuste_negativo?: number;
     id_tipo_transaccion_factura_contado_emitida?: number;

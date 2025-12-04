@@ -24,10 +24,7 @@
                         <small class="text-muted d-block">Usuario</small>
                         <strong>{{ userAlias }}</strong>
                     </div>
-                    <a class="dropdown-item" href="#">
-                        <i class="fas fa-user me-2"></i>Perfil
-                    </a>
-                    <a class="dropdown-item" href="#">
+                    <a class="dropdown-item" href="javascript:void(0)" (click)="abrirModalConfiguracion()">
                         <i class="fas fa-cog me-2"></i>Configuración
                     </a>
                     <div class="dropdown-divider"></div>
@@ -39,3 +36,146 @@
         </ul>
     </div>
 </nav>
+
+<!-- Modal de Configuración de Usuario -->
+<div class="modal" [class.show]="showConfigModal" [style.display]="showConfigModal ? 'block' : 'none'" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-cog me-2"></i>
+                    Configuración de Usuario
+                </h5>
+                <button type="button" class="btn-close" (click)="cerrarModalConfiguracion()"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Loading Spinner -->
+                <div *ngIf="loading" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="text-muted mt-2 mb-0">Cargando datos...</p>
+                </div>
+
+                <!-- Contenido del modal -->
+                <div *ngIf="!loading">
+                    <!-- Información del Usuario -->
+                    <div class="mb-4">
+                        <h6 class="text-primary border-bottom pb-2 mb-3">
+                            <i class="fas fa-user me-2"></i>Información del Usuario
+                        </h6>
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="text-muted d-block">Nombre</small>
+                                <strong>{{ userName }}</strong>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted d-block">Usuario</small>
+                                <strong>{{ userAlias }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Columna: Configuración del Sistema -->
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-header bg-light py-2">
+                                    <h6 class="mb-0 text-primary">
+                                        <i class="fas fa-sliders-h me-2"></i>Configuración del Sistema
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Estado actual -->
+                                    <div *ngIf="configuracionActual" class="alert alert-info py-2 mb-3">
+                                        <i class="fas fa-check-circle me-2"></i>
+                                        <small><strong>Actual:</strong> {{ configuracionActual.descripcion ||
+                                            'Configuración #' + configuracionActual.id_configuracion_sistema }}</small>
+                                    </div>
+                                    <div *ngIf="!configuracionActual" class="alert alert-warning py-2 mb-3">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        <small>Sin configuración asignada</small>
+                                    </div>
+
+                                    <!-- Selector -->
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">
+                                            {{ configuracionActual ? 'Cambiar configuración' : 'Seleccionar
+                                            configuración' }}
+                                        </label>
+                                        <select class="form-select form-select-sm"
+                                            [(ngModel)]="configuracionSeleccionada" name="configuracion">
+                                            <option [ngValue]="undefined">Seleccione...</option>
+                                            <option *ngFor="let config of configuraciones"
+                                                [ngValue]="config.id_configuracion_sistema">
+                                                {{ config.descripcion || 'Configuración #' +
+                                                config.id_configuracion_sistema }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white py-2">
+                                    <button type="button" class="btn btn-primary btn-sm w-100"
+                                        (click)="guardarConfiguracion()"
+                                        [disabled]="loading || !configuracionSeleccionada">
+                                        <i class="fas fa-save me-2"></i>Guardar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Columna: Terminal Asignada -->
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-header bg-light py-2">
+                                    <h6 class="mb-0 text-primary">
+                                        <i class="fas fa-desktop me-2"></i>Terminal Asignada
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Estado actual -->
+                                    <div *ngIf="terminalActual" class="alert alert-info py-2 mb-3">
+                                        <i class="fas fa-check-circle me-2"></i>
+                                        <small><strong>Actual:</strong> {{ terminalActual.nombre }}</small>
+                                    </div>
+                                    <div *ngIf="!terminalActual" class="alert alert-warning py-2 mb-3">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        <small>Sin terminal asignada</small>
+                                    </div>
+
+                                    <!-- Selector -->
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">
+                                            {{ terminalActual ? 'Cambiar terminal' : 'Seleccionar terminal' }}
+                                        </label>
+                                        <select class="form-select form-select-sm" [(ngModel)]="terminalSeleccionada"
+                                            name="terminal">
+                                            <option [ngValue]="undefined">Seleccione...</option>
+                                            <option *ngFor="let terminal of terminales"
+                                                [ngValue]="terminal.id_terminal">
+                                                {{ terminal.nombre }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white py-2">
+                                    <button type="button" class="btn btn-primary btn-sm w-100"
+                                        (click)="guardarTerminal()" [disabled]="loading || !terminalSeleccionada">
+                                        <i class="fas fa-save me-2"></i>Guardar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="cerrarModalConfiguracion()"
+                    [disabled]="loading">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-backdrop fade" [class.show]="showConfigModal" *ngIf="showConfigModal"></div>

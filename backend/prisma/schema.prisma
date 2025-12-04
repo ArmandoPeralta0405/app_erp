@@ -111,20 +111,22 @@ model rol_programa {
 }
 
 model usuario {
-  id_usuario                                       Int           @id(map: "pk_usuario") @default(autoincrement())
-  nombre                                           String        @db.VarChar(150)
-  apellido                                         String        @db.VarChar(150)
-  cedula                                           String?       @db.VarChar(20)
-  telefono                                         String?       @db.VarChar(25)
-  direccion                                        String?       @db.VarChar(500)
-  estado                                           Boolean?      @default(true)
-  alias                                            String        @unique(map: "uk_usuario_alias") @db.VarChar(50)
-  clave                                            String        @db.VarChar(250)
-  fecha_creacion                                   DateTime?     @default(now()) @db.Timestamptz(6)
-  fecha_actualizacion                              DateTime?     @default(now()) @db.Timestamptz(6)
-  articulo_articulo_usuario_actualizacionTousuario articulo[]    @relation("articulo_usuario_actualizacionTousuario")
-  articulo_articulo_usuario_creacionTousuario      articulo[]    @relation("articulo_usuario_creacionTousuario")
+  id_usuario                                       Int                             @id(map: "pk_usuario") @default(autoincrement())
+  nombre                                           String                          @db.VarChar(150)
+  apellido                                         String                          @db.VarChar(150)
+  cedula                                           String?                         @db.VarChar(20)
+  telefono                                         String?                         @db.VarChar(25)
+  direccion                                        String?                         @db.VarChar(500)
+  estado                                           Boolean?                        @default(true)
+  alias                                            String                          @unique(map: "uk_usuario_alias") @db.VarChar(50)
+  clave                                            String                          @db.VarChar(250)
+  fecha_creacion                                   DateTime?                       @default(now()) @db.Timestamptz(6)
+  fecha_actualizacion                              DateTime?                       @default(now()) @db.Timestamptz(6)
+  articulo_articulo_usuario_actualizacionTousuario articulo[]                      @relation("articulo_usuario_actualizacionTousuario")
+  articulo_articulo_usuario_creacionTousuario      articulo[]                      @relation("articulo_usuario_creacionTousuario")
+  usuario_configuracion_sistema                    usuario_configuracion_sistema[]
   usuario_rol                                      usuario_rol[]
+  usuario_terminal                                 usuario_terminal[]
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -400,7 +402,7 @@ model tipo_transaccion {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model configuracion_sistema {
-  id_configuracion_sistema                                                                              Int               @id(map: "pk_configuracion_sistema") @default(autoincrement())
+  id_configuracion_sistema                                                                              Int                             @id(map: "pk_configuracion_sistema") @default(autoincrement())
   id_tipo_transaccion_ajuste_positivo                                                                   Int?
   id_tipo_transaccion_ajuste_negativo                                                                   Int?
   id_tipo_transaccion_factura_contado_emitida                                                           Int?
@@ -411,15 +413,53 @@ model configuracion_sistema {
   id_tipo_transaccion_nota_credito_recibida                                                             Int?
   id_tipo_transaccion_remision_emitida                                                                  Int?
   id_tipo_transaccion_remision_recibida                                                                 Int?
-  estado                                                                                                Boolean?          @default(true)
-  tipo_transaccion_configuracion_sistema_id_tipo_transaccion_ajuste_negativoTotipo_transaccion          tipo_transaccion? @relation("configuracion_sistema_id_tipo_transaccion_ajuste_negativoTotipo_transaccion", fields: [id_tipo_transaccion_ajuste_negativo], references: [id_tipo_transaccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_conf_ajuste_neg")
-  tipo_transaccion_configuracion_sistema_id_tipo_transaccion_ajuste_positivoTotipo_transaccion          tipo_transaccion? @relation("configuracion_sistema_id_tipo_transaccion_ajuste_positivoTotipo_transaccion", fields: [id_tipo_transaccion_ajuste_positivo], references: [id_tipo_transaccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_conf_ajuste_pos")
-  tipo_transaccion_configuracion_sistema_id_tipo_transaccion_factura_contado_emitidaTotipo_transaccion  tipo_transaccion? @relation("configuracion_sistema_id_tipo_transaccion_factura_contado_emitidaTotipo_transaccion", fields: [id_tipo_transaccion_factura_contado_emitida], references: [id_tipo_transaccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_conf_fact_emitida")
-  tipo_transaccion_configuracion_sistema_id_tipo_transaccion_factura_contado_recibidaTotipo_transaccion tipo_transaccion? @relation("configuracion_sistema_id_tipo_transaccion_factura_contado_recibidaTotipo_transaccion", fields: [id_tipo_transaccion_factura_contado_recibida], references: [id_tipo_transaccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_conf_fact_recibida")
-  tipo_transaccion_configuracion_sistema_id_tipo_transaccion_factura_credito_emitidaTotipo_transaccion  tipo_transaccion? @relation("configuracion_sistema_id_tipo_transaccion_factura_credito_emitidaTotipo_transaccion", fields: [id_tipo_transaccion_factura_credito_emitida], references: [id_tipo_transaccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_conf_fact_cred_emitida")
-  tipo_transaccion_configuracion_sistema_id_tipo_transaccion_factura_credito_recibidaTotipo_transaccion tipo_transaccion? @relation("configuracion_sistema_id_tipo_transaccion_factura_credito_recibidaTotipo_transaccion", fields: [id_tipo_transaccion_factura_credito_recibida], references: [id_tipo_transaccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_conf_fact_cred_recibida")
-  tipo_transaccion_configuracion_sistema_id_tipo_transaccion_nota_credito_emitidaTotipo_transaccion     tipo_transaccion? @relation("configuracion_sistema_id_tipo_transaccion_nota_credito_emitidaTotipo_transaccion", fields: [id_tipo_transaccion_nota_credito_emitida], references: [id_tipo_transaccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_conf_nc_emitida")
-  tipo_transaccion_configuracion_sistema_id_tipo_transaccion_nota_credito_recibidaTotipo_transaccion    tipo_transaccion? @relation("configuracion_sistema_id_tipo_transaccion_nota_credito_recibidaTotipo_transaccion", fields: [id_tipo_transaccion_nota_credito_recibida], references: [id_tipo_transaccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_conf_nc_recibida")
-  tipo_transaccion_configuracion_sistema_id_tipo_transaccion_remision_emitidaTotipo_transaccion         tipo_transaccion? @relation("configuracion_sistema_id_tipo_transaccion_remision_emitidaTotipo_transaccion", fields: [id_tipo_transaccion_remision_emitida], references: [id_tipo_transaccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_conf_rem_emitida")
-  tipo_transaccion_configuracion_sistema_id_tipo_transaccion_remision_recibidaTotipo_transaccion        tipo_transaccion? @relation("configuracion_sistema_id_tipo_transaccion_remision_recibidaTotipo_transaccion", fields: [id_tipo_transaccion_remision_recibida], references: [id_tipo_transaccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_conf_rem_recibida")
+  estado                                                                                                Boolean?                        @default(true)
+  descripcion                                                                                           String?                         @db.VarChar(250)
+  tipo_transaccion_configuracion_sistema_id_tipo_transaccion_ajuste_negativoTotipo_transaccion          tipo_transaccion?               @relation("configuracion_sistema_id_tipo_transaccion_ajuste_negativoTotipo_transaccion", fields: [id_tipo_transaccion_ajuste_negativo], references: [id_tipo_transaccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_conf_ajuste_neg")
+  tipo_transaccion_configuracion_sistema_id_tipo_transaccion_ajuste_positivoTotipo_transaccion          tipo_transaccion?               @relation("configuracion_sistema_id_tipo_transaccion_ajuste_positivoTotipo_transaccion", fields: [id_tipo_transaccion_ajuste_positivo], references: [id_tipo_transaccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_conf_ajuste_pos")
+  tipo_transaccion_configuracion_sistema_id_tipo_transaccion_factura_contado_emitidaTotipo_transaccion  tipo_transaccion?               @relation("configuracion_sistema_id_tipo_transaccion_factura_contado_emitidaTotipo_transaccion", fields: [id_tipo_transaccion_factura_contado_emitida], references: [id_tipo_transaccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_conf_fact_emitida")
+  tipo_transaccion_configuracion_sistema_id_tipo_transaccion_factura_contado_recibidaTotipo_transaccion tipo_transaccion?               @relation("configuracion_sistema_id_tipo_transaccion_factura_contado_recibidaTotipo_transaccion", fields: [id_tipo_transaccion_factura_contado_recibida], references: [id_tipo_transaccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_conf_fact_recibida")
+  tipo_transaccion_configuracion_sistema_id_tipo_transaccion_factura_credito_emitidaTotipo_transaccion  tipo_transaccion?               @relation("configuracion_sistema_id_tipo_transaccion_factura_credito_emitidaTotipo_transaccion", fields: [id_tipo_transaccion_factura_credito_emitida], references: [id_tipo_transaccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_conf_fact_cred_emitida")
+  tipo_transaccion_configuracion_sistema_id_tipo_transaccion_factura_credito_recibidaTotipo_transaccion tipo_transaccion?               @relation("configuracion_sistema_id_tipo_transaccion_factura_credito_recibidaTotipo_transaccion", fields: [id_tipo_transaccion_factura_credito_recibida], references: [id_tipo_transaccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_conf_fact_cred_recibida")
+  tipo_transaccion_configuracion_sistema_id_tipo_transaccion_nota_credito_emitidaTotipo_transaccion     tipo_transaccion?               @relation("configuracion_sistema_id_tipo_transaccion_nota_credito_emitidaTotipo_transaccion", fields: [id_tipo_transaccion_nota_credito_emitida], references: [id_tipo_transaccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_conf_nc_emitida")
+  tipo_transaccion_configuracion_sistema_id_tipo_transaccion_nota_credito_recibidaTotipo_transaccion    tipo_transaccion?               @relation("configuracion_sistema_id_tipo_transaccion_nota_credito_recibidaTotipo_transaccion", fields: [id_tipo_transaccion_nota_credito_recibida], references: [id_tipo_transaccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_conf_nc_recibida")
+  tipo_transaccion_configuracion_sistema_id_tipo_transaccion_remision_emitidaTotipo_transaccion         tipo_transaccion?               @relation("configuracion_sistema_id_tipo_transaccion_remision_emitidaTotipo_transaccion", fields: [id_tipo_transaccion_remision_emitida], references: [id_tipo_transaccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_conf_rem_emitida")
+  tipo_transaccion_configuracion_sistema_id_tipo_transaccion_remision_recibidaTotipo_transaccion        tipo_transaccion?               @relation("configuracion_sistema_id_tipo_transaccion_remision_recibidaTotipo_transaccion", fields: [id_tipo_transaccion_remision_recibida], references: [id_tipo_transaccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_conf_rem_recibida")
+  usuario_configuracion_sistema                                                                         usuario_configuracion_sistema[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model usuario_configuracion_sistema {
+  id_usuario               Int
+  id_configuracion_sistema Int
+  configuracion_sistema    configuracion_sistema @relation(fields: [id_configuracion_sistema], references: [id_configuracion_sistema], onDelete: Cascade, onUpdate: NoAction, map: "fk_usuario_config_configuracion")
+  usuario                  usuario               @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade, onUpdate: NoAction, map: "fk_usuario_config_usuario")
+
+  @@id([id_usuario, id_configuracion_sistema], map: "pk_usuario_configuracion_sistema")
+  @@index([id_configuracion_sistema], map: "idx_usuario_config_configuracion")
+  @@index([id_usuario], map: "idx_usuario_config_usuario")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model terminal {
+  id_terminal                Int                @id(map: "pk_terminal") @default(autoincrement())
+  nombre                     String             @db.VarChar(150)
+  limite_items               Int?               @default(15)
+  observacion                String?            @db.VarChar(250)
+  ultimo_numero_factura      BigInt?            @default(0)
+  ultimo_numero_nota_credito BigInt?            @default(0)
+  ultimo_numero_remision     BigInt?            @default(0)
+  estado                     Boolean?           @default(true)
+  usuario_terminal           usuario_terminal[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model usuario_terminal {
+  id_usuario  Int
+  id_terminal Int
+  terminal    terminal @relation(fields: [id_terminal], references: [id_terminal], onDelete: Cascade, onUpdate: NoAction, map: "fk_usuario_terminal_terminal")
+  usuario     usuario  @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade, onUpdate: NoAction, map: "fk_usuario_terminal_usuario")
+
+  @@id([id_usuario, id_terminal], map: "pk_usuario_terminal")
+  @@index([id_usuario], map: "idx_usuario_terminal_usuario")
 }
