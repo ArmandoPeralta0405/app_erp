@@ -30,6 +30,10 @@ export class CreateTerminalDto {
     ultimo_numero_remision?: number;
 
     @IsOptional()
+    @Type(() => Number)
+    ultimo_numero_ajuste?: number;
+
+    @IsOptional()
     @IsBoolean()
     estado?: boolean;
 }

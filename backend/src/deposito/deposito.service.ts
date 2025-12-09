@@ -24,6 +24,23 @@ export class DepositoService {
     });
   }
 
+  // 1.1 OBTENER DEPÓSITOS POR SUCURSAL
+  async findBySucursal(id_sucursal: number): Promise<DepositoModel[]> {
+    return this.prisma.deposito.findMany({
+      where: {
+        id_sucursal: id_sucursal,
+      },
+      include: {
+        sucursal: {
+          include: { empresa: true },
+        },
+      },
+      orderBy: {
+        nombre: 'asc',
+      },
+    });
+  }
+
   // 2. OBTENER UN DEPÓSITO POR ID
   async findOne(id: number): Promise<DepositoModel> {
     const key: DepositoUniqueKey = { id_deposito: id };

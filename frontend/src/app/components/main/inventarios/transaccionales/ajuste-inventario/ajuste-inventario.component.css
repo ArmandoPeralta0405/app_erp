@@ -1,0 +1,41 @@
+/* ajuste-inventario.component.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+:host {
+    font-family: 'Inter', sans-serif;
+}
+
+.card {
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.form-control-sm {
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.form-control-sm:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, .2);
+}
+
+.btn {
+    transition: transform .15s ease, background-color .15s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(74, 144, 226, .05);
+}
+
+.card-footer .bg-light {
+    background: linear-gradient(135deg, #f0f8ff, #e6f2ff);
+}
+
+.modal.show {
+    display: block;
+    background-color: rgba(0, 0, 0, 0.5);
+}

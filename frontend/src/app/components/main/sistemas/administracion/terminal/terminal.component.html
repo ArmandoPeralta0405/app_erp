@@ -51,6 +51,7 @@
                   <th class="border-0 text-center">Últ. Factura</th>
                   <th class="border-0 text-center">Últ. NC</th>
                   <th class="border-0 text-center">Últ. Remisión</th>
+                  <th class="border-0 text-center">Últ. Ajuste</th>
                   <th class="border-0 text-center">Usuarios</th>
                   <th class="border-0 text-center">Estado</th>
                   <th class="border-0 text-center">Acciones</th>
@@ -58,7 +59,7 @@
               </thead>
               <tbody>
                 <tr *ngIf="terminalesFiltrados.length === 0">
-                  <td colspan="9" class="text-center text-muted py-5">
+                  <td colspan="10" class="text-center text-muted py-5">
                     <i class="fas fa-inbox fa-3x mb-3 d-block text-muted opacity-50"></i>
                     <p class="mb-0">{{ searchTerm ? 'No se encontraron resultados' : 'No hay terminales registradas' }}
                     </p>
@@ -88,6 +89,10 @@
                   <td class="align-middle text-center" data-label="Últ. Remisión">
                     <span class="badge bg-secondary font-monospace">{{
                       formatearNumeroDocumento(terminal.ultimo_numero_remision || 0) }}</span>
+                  </td>
+                  <td class="align-middle text-center" data-label="Últ. Ajuste">
+                    <span class="badge bg-warning text-dark font-monospace">{{
+                      formatearNumeroDocumento(terminal.ultimo_numero_ajuste || 0) }}</span>
                   </td>
                   <td class="align-middle text-center" data-label="Usuarios">
                     <span class="badge bg-primary">{{ getUsuariosAsignados(terminal) }}</span>
@@ -269,6 +274,37 @@
               </div>
               <div class="col-auto">
                 <span class="badge bg-secondary font-monospace">{{ getPreview('remision') }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Último Nº Ajuste -->
+          <div class="mb-3">
+            <label class="form-label">Último Nº Ajuste</label>
+            <div class="row g-2 align-items-center">
+              <div class="col-auto">
+                <input type="text" class="form-control text-center font-monospace" style="width: 70px;"
+                  [(ngModel)]="ajusteEstablecimiento" name="ajusteEstablecimiento" (input)="onNumeroChange('ajuste')"
+                  maxlength="3" placeholder="001">
+              </div>
+              <div class="col-auto">
+                <span class="text-muted fw-bold">-</span>
+              </div>
+              <div class="col-auto">
+                <input type="text" class="form-control text-center font-monospace" style="width: 70px;"
+                  [(ngModel)]="ajustePuntoExpedicion" name="ajustePuntoExpedicion" (input)="onNumeroChange('ajuste')"
+                  maxlength="3" placeholder="001">
+              </div>
+              <div class="col-auto">
+                <span class="text-muted fw-bold">-</span>
+              </div>
+              <div class="col-auto">
+                <input type="text" class="form-control text-center font-monospace" style="width: 110px;"
+                  [(ngModel)]="ajusteSecuencia" name="ajusteSecuencia" (input)="onNumeroChange('ajuste')" maxlength="7"
+                  placeholder="0000000">
+              </div>
+              <div class="col-auto">
+                <span class="badge bg-warning text-dark font-monospace">{{ getPreview('ajuste') }}</span>
               </div>
             </div>
           </div>

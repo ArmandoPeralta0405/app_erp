@@ -11,6 +11,7 @@ export interface Terminal {
     ultimo_numero_factura?: number;
     ultimo_numero_nota_credito?: number;
     ultimo_numero_remision?: number;
+    ultimo_numero_ajuste?: number;
     estado?: boolean;
     usuario_terminal?: any[];
 }
@@ -22,6 +23,7 @@ export interface CreateTerminalDto {
     ultimo_numero_factura?: number;
     ultimo_numero_nota_credito?: number;
     ultimo_numero_remision?: number;
+    ultimo_numero_ajuste?: number;
     estado?: boolean;
 }
 
@@ -32,6 +34,7 @@ export interface UpdateTerminalDto {
     ultimo_numero_factura?: number;
     ultimo_numero_nota_credito?: number;
     ultimo_numero_remision?: number;
+    ultimo_numero_ajuste?: number;
     estado?: boolean;
 }
 

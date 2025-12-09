@@ -45,6 +45,10 @@ export class DepositoService {
         return this.http.get<Deposito[]>(this.apiUrl);
     }
 
+    getBySucursal(id_sucursal: number): Observable<Deposito[]> {
+        return this.http.get<Deposito[]>(`${this.apiUrl}/sucursal/${id_sucursal}`);
+    }
+
     getOne(id: number): Observable<Deposito> {
         return this.http.get<Deposito>(`${this.apiUrl}/${id}`);
     }

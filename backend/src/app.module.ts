@@ -35,6 +35,8 @@ import { ConfiguracionSistemaModule } from './configuracion_sistema/configuracio
 import { UsuarioConfiguracionSistemaModule } from './usuario_configuracion_sistema/usuario_configuracion_sistema.module';
 import { TerminalModule } from './terminal/terminal.module';
 import { UsuarioTerminalModule } from './usuario_terminal/usuario_terminal.module';
+import { MovimientoStockModule } from './movimiento-stock/movimiento-stock.module';
+import { AjusteInventarioModule } from './ajuste-inventario/ajuste-inventario.module';
 
 @Module({
   imports: [
@@ -71,6 +73,8 @@ import { UsuarioTerminalModule } from './usuario_terminal/usuario_terminal.modul
     UsuarioConfiguracionSistemaModule,
     TerminalModule,
     UsuarioTerminalModule,
+    MovimientoStockModule,
+    AjusteInventarioModule,
   ],
 
   controllers: [AppController],

@@ -14,6 +14,7 @@ model deposito {
   estado            Boolean?            @default(true)
   articulo_deposito articulo_deposito[]
   sucursal          sucursal            @relation(fields: [id_sucursal], references: [id_sucursal], onDelete: NoAction, onUpdate: NoAction, map: "fk_deposito_sucursal")
+  movimiento_stock  movimiento_stock[]
 
   @@index([id_sucursal], map: "idx_deposito_sucursal")
   @@index([estado], map: "idx_deposito_estado")
@@ -32,25 +33,27 @@ model empresa {
 }
 
 model moneda {
-  id_moneda        Int          @id(map: "pk_moneda") @default(autoincrement())
-  nombre           String       @db.VarChar(150)
-  simbolo          String       @db.VarChar(5)
-  cantidad_decimal Int?         @default(0)
-  estado           Boolean?     @default(true)
+  id_moneda        Int                @id(map: "pk_moneda") @default(autoincrement())
+  nombre           String             @db.VarChar(150)
+  simbolo          String             @db.VarChar(5)
+  cantidad_decimal Int?               @default(0)
+  estado           Boolean?           @default(true)
   cotizacion       cotizacion[]
+  movimiento_stock movimiento_stock[]
 }
 
 model sucursal {
-  id_sucursal  Int        @id(map: "pk_sucursal") @default(autoincrement())
-  id_empresa   Int
-  nombre       String     @db.VarChar(150)
-  telefono     String?    @db.VarChar(25)
-  direccion    String?    @db.VarChar(500)
-  correo       String?    @db.VarChar(250)
-  estado       Boolean?   @default(true)
-  casa_central String?    @default("N") @db.VarChar(1)
-  deposito     deposito[]
-  empresa      empresa    @relation(fields: [id_empresa], references: [id_empresa], onDelete: NoAction, onUpdate: NoAction, map: "fk_sucursal_empresa")
+  id_sucursal      Int                @id(map: "pk_sucursal") @default(autoincrement())
+  id_empresa       Int
+  nombre           String             @db.VarChar(150)
+  telefono         String?            @db.VarChar(25)
+  direccion        String?            @db.VarChar(500)
+  correo           String?            @db.VarChar(250)
+  estado           Boolean?           @default(true)
+  casa_central     String?            @default("N") @db.VarChar(1)
+  deposito         deposito[]
+  movimiento_stock movimiento_stock[]
+  empresa          empresa            @relation(fields: [id_empresa], references: [id_empresa], onDelete: NoAction, onUpdate: NoAction, map: "fk_sucursal_empresa")
 
   @@index([id_empresa], map: "idx_sucursal_empresa")
   @@index([estado], map: "idx_sucursal_estado")
@@ -124,6 +127,7 @@ model usuario {
   fecha_actualizacion                              DateTime?                       @default(now()) @db.Timestamptz(6)
   articulo_articulo_usuario_actualizacionTousuario articulo[]                      @relation("articulo_usuario_actualizacionTousuario")
   articulo_articulo_usuario_creacionTousuario      articulo[]                      @relation("articulo_usuario_creacionTousuario")
+  movimiento_stock                                 movimiento_stock[]
   usuario_configuracion_sistema                    usuario_configuracion_sistema[]
   usuario_rol                                      usuario_rol[]
   usuario_terminal                                 usuario_terminal[]
@@ -196,30 +200,31 @@ model unidad_medida {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model articulo {
-  id_articulo                                     Int                     @id(map: "pk_articulo") @default(autoincrement())
-  codigo_alfanumerico                             String?                 @db.VarChar(100)
-  referencia                                      String?                 @db.VarChar(200)
-  nombre                                          String                  @db.VarChar(250)
-  descripcion                                     String?                 @db.VarChar(500)
+  id_articulo                                     Int                        @id(map: "pk_articulo") @default(autoincrement())
+  codigo_alfanumerico                             String?                    @db.VarChar(100)
+  referencia                                      String?                    @db.VarChar(200)
+  nombre                                          String                     @db.VarChar(250)
+  descripcion                                     String?                    @db.VarChar(500)
   id_linea                                        Int?
   id_tipo_articulo                                Int?
   id_marca                                        Int?
   id_unidad_medida                                Int
   id_impuesto                                     Int?
-  estado                                          Boolean?                @default(true)
-  fecha_creacion                                  DateTime?               @default(now()) @db.Timestamp(6)
-  fecha_actualizacion                             DateTime?               @default(now()) @db.Timestamp(6)
+  estado                                          Boolean?                   @default(true)
+  fecha_creacion                                  DateTime?                  @default(now()) @db.Timestamp(6)
+  fecha_actualizacion                             DateTime?                  @default(now()) @db.Timestamp(6)
   usuario_creacion                                Int?
   usuario_actualizacion                           Int?
-  impuesto                                        impuesto?               @relation(fields: [id_impuesto], references: [id_impuesto], onDelete: NoAction, onUpdate: NoAction, map: "fk_articulo_impuesto")
-  linea                                           linea?                  @relation(fields: [id_linea], references: [id_linea], onDelete: NoAction, onUpdate: NoAction, map: "fk_articulo_linea")
-  marca                                           marca?                  @relation(fields: [id_marca], references: [id_marca], onDelete: NoAction, onUpdate: NoAction, map: "fk_articulo_marca")
-  tipo_articulo                                   tipo_articulo?          @relation(fields: [id_tipo_articulo], references: [id_tipo_articulo], onDelete: NoAction, onUpdate: NoAction, map: "fk_articulo_tipo_articulo")
-  unidad_medida                                   unidad_medida           @relation(fields: [id_unidad_medida], references: [id_unidad_medida], onDelete: NoAction, onUpdate: NoAction, map: "fk_articulo_unidad_medida")
-  usuario_articulo_usuario_actualizacionTousuario usuario?                @relation("articulo_usuario_actualizacionTousuario", fields: [usuario_actualizacion], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_articulo_usuario_actualizacion")
-  usuario_articulo_usuario_creacionTousuario      usuario?                @relation("articulo_usuario_creacionTousuario", fields: [usuario_creacion], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_articulo_usuario_creacion")
+  impuesto                                        impuesto?                  @relation(fields: [id_impuesto], references: [id_impuesto], onDelete: NoAction, onUpdate: NoAction, map: "fk_articulo_impuesto")
+  linea                                           linea?                     @relation(fields: [id_linea], references: [id_linea], onDelete: NoAction, onUpdate: NoAction, map: "fk_articulo_linea")
+  marca                                           marca?                     @relation(fields: [id_marca], references: [id_marca], onDelete: NoAction, onUpdate: NoAction, map: "fk_articulo_marca")
+  tipo_articulo                                   tipo_articulo?             @relation(fields: [id_tipo_articulo], references: [id_tipo_articulo], onDelete: NoAction, onUpdate: NoAction, map: "fk_articulo_tipo_articulo")
+  unidad_medida                                   unidad_medida              @relation(fields: [id_unidad_medida], references: [id_unidad_medida], onDelete: NoAction, onUpdate: NoAction, map: "fk_articulo_unidad_medida")
+  usuario_articulo_usuario_actualizacionTousuario usuario?                   @relation("articulo_usuario_actualizacionTousuario", fields: [usuario_actualizacion], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_articulo_usuario_actualizacion")
+  usuario_articulo_usuario_creacionTousuario      usuario?                   @relation("articulo_usuario_creacionTousuario", fields: [usuario_creacion], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_articulo_usuario_creacion")
   articulo_codigo_barra                           articulo_codigo_barra[]
   articulo_deposito                               articulo_deposito[]
+  movimiento_stock_detalle                        movimiento_stock_detalle[]
 
   @@index([codigo_alfanumerico], map: "idx_articulo_codigo_alfanumerico")
   @@index([estado], map: "idx_articulo_estado")
@@ -297,18 +302,19 @@ model ciudad {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model cliente {
-  id_cliente       Int      @id @default(autoincrement())
+  id_cliente       Int                @id @default(autoincrement())
   id_ciudad        Int
-  nombre           String   @db.VarChar(250)
-  es_contribuyente Boolean? @default(false)
-  ruc              String?  @db.VarChar(20)
-  ci               String?  @db.VarChar(20)
-  dv               String?  @db.VarChar(2)
-  telefono         String?  @db.VarChar(50)
-  direccion        String?  @db.VarChar(200)
-  email            String?  @db.VarChar(250)
-  estado           Boolean? @default(true)
-  ciudad           ciudad   @relation(fields: [id_ciudad], references: [id_ciudad], onDelete: NoAction, onUpdate: NoAction, map: "fk_cliente_ciudad")
+  nombre           String             @db.VarChar(250)
+  es_contribuyente Boolean?           @default(false)
+  ruc              String?            @db.VarChar(20)
+  ci               String?            @db.VarChar(20)
+  dv               String?            @db.VarChar(2)
+  telefono         String?            @db.VarChar(50)
+  direccion        String?            @db.VarChar(200)
+  email            String?            @db.VarChar(250)
+  estado           Boolean?           @default(true)
+  ciudad           ciudad             @relation(fields: [id_ciudad], references: [id_ciudad], onDelete: NoAction, onUpdate: NoAction, map: "fk_cliente_ciudad")
+  movimiento_stock movimiento_stock[]
 
   @@index([ci], map: "idx_cliente_ci")
   @@index([id_ciudad], map: "idx_cliente_ciudad")
@@ -318,20 +324,21 @@ model cliente {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model proveedor {
-  id_proveedor           Int      @id @default(autoincrement())
+  id_proveedor           Int                @id @default(autoincrement())
   id_ciudad              Int
-  razon_social           String   @db.VarChar(250)
-  es_contribuyente       Boolean? @default(false)
-  ruc                    String   @db.VarChar(20)
-  dv                     String?  @db.VarChar(2)
-  telefono               String?  @db.VarChar(50)
-  direccion              String?  @db.VarChar(200)
-  email                  String?  @db.VarChar(250)
-  representante_nombre   String?  @db.VarChar(150)
-  representante_telefono String?  @db.VarChar(50)
-  representante_email    String?  @db.VarChar(100)
-  estado                 Boolean? @default(true)
-  ciudad                 ciudad   @relation(fields: [id_ciudad], references: [id_ciudad], onDelete: NoAction, onUpdate: NoAction, map: "fk_proveedor_ciudad")
+  razon_social           String             @db.VarChar(250)
+  es_contribuyente       Boolean?           @default(false)
+  ruc                    String             @db.VarChar(20)
+  dv                     String?            @db.VarChar(2)
+  telefono               String?            @db.VarChar(50)
+  direccion              String?            @db.VarChar(200)
+  email                  String?            @db.VarChar(250)
+  representante_nombre   String?            @db.VarChar(150)
+  representante_telefono String?            @db.VarChar(50)
+  representante_email    String?            @db.VarChar(100)
+  estado                 Boolean?           @default(true)
+  movimiento_stock       movimiento_stock[]
+  ciudad                 ciudad             @relation(fields: [id_ciudad], references: [id_ciudad], onDelete: NoAction, onUpdate: NoAction, map: "fk_proveedor_ciudad")
 
   @@index([id_ciudad], map: "idx_proveedor_ciudad")
   @@index([razon_social], map: "idx_proveedor_razon_social")
@@ -353,10 +360,11 @@ model articulo_deposito {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model motivo_ajuste_inventario {
-  id_motivo_ajuste_inventario Int      @id(map: "pk_motivo_ajuste_inventario") @default(autoincrement())
-  nombre                      String   @db.VarChar(100)
-  descripcion                 String?  @db.VarChar(250)
-  estado                      Boolean? @default(true)
+  id_motivo_ajuste_inventario Int                @id(map: "pk_motivo_ajuste_inventario") @default(autoincrement())
+  nombre                      String             @db.VarChar(100)
+  descripcion                 String?            @db.VarChar(250)
+  estado                      Boolean?           @default(true)
+  movimiento_stock            movimiento_stock[]
 
   @@index([estado], map: "idx_motivo_ajuste_inventario_estado")
 }
@@ -392,6 +400,7 @@ model tipo_transaccion {
   configuracion_sistema_configuracion_sistema_id_tipo_transaccion_nota_credito_recibidaTotipo_transaccion    configuracion_sistema[] @relation("configuracion_sistema_id_tipo_transaccion_nota_credito_recibidaTotipo_transaccion")
   configuracion_sistema_configuracion_sistema_id_tipo_transaccion_remision_emitidaTotipo_transaccion         configuracion_sistema[] @relation("configuracion_sistema_id_tipo_transaccion_remision_emitidaTotipo_transaccion")
   configuracion_sistema_configuracion_sistema_id_tipo_transaccion_remision_recibidaTotipo_transaccion        configuracion_sistema[] @relation("configuracion_sistema_id_tipo_transaccion_remision_recibidaTotipo_transaccion")
+  movimiento_stock                                                                                           movimiento_stock[]
   clase_documento                                                                                            clase_documento         @relation(fields: [id_clase_documento], references: [id_clase_documento], onDelete: NoAction, onUpdate: NoAction, map: "fk_tipo_transaccion_clase")
 
   @@index([id_clase_documento], map: "idx_tipo_transaccion_clase")
@@ -449,6 +458,7 @@ model terminal {
   ultimo_numero_factura      BigInt?            @default(0)
   ultimo_numero_nota_credito BigInt?            @default(0)
   ultimo_numero_remision     BigInt?            @default(0)
+  ultimo_numero_ajuste       BigInt?            @default(0)
   estado                     Boolean?           @default(true)
   usuario_terminal           usuario_terminal[]
 }
@@ -462,4 +472,72 @@ model usuario_terminal {
 
   @@id([id_usuario, id_terminal], map: "pk_usuario_terminal")
   @@index([id_usuario], map: "idx_usuario_terminal_usuario")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model movimiento_stock {
+  id_movimiento_stock       Int                        @id @default(autoincrement())
+  id_tipo_transaccion       Int
+  id_sucursal               Int
+  id_deposito               Int
+  id_usuario                Int
+  id_moneda                 Int
+  id_cliente                Int?
+  id_proveedor              Int?
+  id_motivo_ajuste          Int?
+  id_movimiento_stock_padre Int?
+  numero_comprobante        BigInt
+  numero_timbrado           BigInt?
+  fecha_documento           DateTime                   @db.Date
+  fecha_grabacion           DateTime                   @default(now()) @db.Timestamp(6)
+  tasa_cambio               Decimal?                   @default(1) @db.Decimal(24, 4)
+  total_ml                  Decimal?                   @default(0) @db.Decimal(24, 4)
+  total_me                  Decimal?                   @db.Decimal(24, 4)
+  observacion               String?                    @db.VarChar(500)
+  cliente                   cliente?                   @relation(fields: [id_cliente], references: [id_cliente], onDelete: NoAction, onUpdate: NoAction, map: "fk_mov_cliente")
+  deposito                  deposito                   @relation(fields: [id_deposito], references: [id_deposito], onDelete: NoAction, onUpdate: NoAction, map: "fk_mov_deposito")
+  moneda                    moneda                     @relation(fields: [id_moneda], references: [id_moneda], onDelete: NoAction, onUpdate: NoAction, map: "fk_mov_moneda")
+  motivo_ajuste_inventario  motivo_ajuste_inventario?  @relation(fields: [id_motivo_ajuste], references: [id_motivo_ajuste_inventario], onDelete: NoAction, onUpdate: NoAction, map: "fk_mov_motivo_ajuste")
+  movimiento_stock          movimiento_stock?          @relation("movimiento_stockTomovimiento_stock", fields: [id_movimiento_stock_padre], references: [id_movimiento_stock], onDelete: NoAction, onUpdate: NoAction, map: "fk_mov_padre")
+  other_movimiento_stock    movimiento_stock[]         @relation("movimiento_stockTomovimiento_stock")
+  proveedor                 proveedor?                 @relation(fields: [id_proveedor], references: [id_proveedor], onDelete: NoAction, onUpdate: NoAction, map: "fk_mov_proveedor")
+  sucursal                  sucursal                   @relation(fields: [id_sucursal], references: [id_sucursal], onDelete: NoAction, onUpdate: NoAction, map: "fk_mov_sucursal")
+  tipo_transaccion          tipo_transaccion           @relation(fields: [id_tipo_transaccion], references: [id_tipo_transaccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_mov_tipo_transaccion")
+  usuario                   usuario                    @relation(fields: [id_usuario], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_mov_usuario")
+  movimiento_stock_detalle  movimiento_stock_detalle[]
+
+  @@index([id_cliente], map: "idx_mov_cliente")
+  @@index([id_deposito], map: "idx_mov_deposito")
+  @@index([fecha_documento], map: "idx_mov_fecha_documento")
+  @@index([id_motivo_ajuste], map: "idx_mov_motivo_ajuste")
+  @@index([numero_comprobante], map: "idx_mov_numero_comprobante")
+  @@index([id_movimiento_stock_padre], map: "idx_mov_padre")
+  @@index([id_proveedor], map: "idx_mov_proveedor")
+  @@index([id_sucursal], map: "idx_mov_sucursal")
+  @@index([id_tipo_transaccion], map: "idx_mov_tipo_transaccion")
+  @@index([id_usuario], map: "idx_mov_usuario")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model movimiento_stock_detalle {
+  id_movimiento_stock  Int
+  id_articulo          Int
+  numero_item          Int
+  cantidad             Decimal          @db.Decimal(24, 4)
+  costo_ml             Decimal?         @default(0) @db.Decimal(24, 4)
+  costo_me             Decimal?         @db.Decimal(24, 4)
+  precio_ml            Decimal?         @default(0) @db.Decimal(24, 4)
+  precio_me            Decimal?         @db.Decimal(24, 4)
+  porcentaje_iva       Decimal?         @default(0) @db.Decimal(6, 2)
+  porcentaje_descuento Decimal?         @default(0) @db.Decimal(6, 2)
+  descuento_ml         Decimal?         @default(0) @db.Decimal(24, 4)
+  descuento_me         Decimal?         @db.Decimal(24, 4)
+  importe_ml           Decimal?         @default(0) @db.Decimal(24, 4)
+  importe_me           Decimal?         @db.Decimal(24, 4)
+  articulo             articulo         @relation(fields: [id_articulo], references: [id_articulo], onDelete: NoAction, onUpdate: NoAction, map: "fk_mov_det_articulo")
+  movimiento_stock     movimiento_stock @relation(fields: [id_movimiento_stock], references: [id_movimiento_stock], onDelete: Cascade, onUpdate: NoAction, map: "fk_mov_det_cabecera")
+
+  @@id([id_movimiento_stock, id_articulo, numero_item], map: "pk_mov_detalle")
+  @@index([id_articulo], map: "idx_mov_det_articulo")
+  @@index([id_movimiento_stock], map: "idx_mov_det_movimiento")
 }

@@ -19,6 +19,11 @@ export class DepositoController {
     return this.depositoService.findAll();
   }
 
+  @Get('sucursal/:id')
+  findBySucursal(@Param('id') id: string) {
+    return this.depositoService.findBySucursal(+id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.depositoService.findOne(+id);

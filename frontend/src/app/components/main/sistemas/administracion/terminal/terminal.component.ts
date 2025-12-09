@@ -57,6 +57,11 @@ export class TerminalComponent implements OnInit {
     remisionPuntoExpedicion = '000';
     remisionSecuencia = '0000000';
 
+    // Ajuste
+    ajusteEstablecimiento = '000';
+    ajustePuntoExpedicion = '000';
+    ajusteSecuencia = '0000000';
+
     // Permisos
     canWrite = false;
     canDelete = false;
@@ -177,6 +182,7 @@ export class TerminalComponent implements OnInit {
             ultimo_numero_factura: 0,
             ultimo_numero_nota_credito: 0,
             ultimo_numero_remision: 0,
+            ultimo_numero_ajuste: 0,
             estado: true
         };
         // Resetear campos de números
@@ -192,6 +198,10 @@ export class TerminalComponent implements OnInit {
         this.remisionPuntoExpedicion = '000';
         this.remisionSecuencia = '0000000';
 
+        this.ajusteEstablecimiento = '000';
+        this.ajustePuntoExpedicion = '000';
+        this.ajusteSecuencia = '0000000';
+
         this.showForm = true;
     }
 
@@ -205,6 +215,7 @@ export class TerminalComponent implements OnInit {
             ultimo_numero_factura: terminal.ultimo_numero_factura || 0,
             ultimo_numero_nota_credito: terminal.ultimo_numero_nota_credito || 0,
             ultimo_numero_remision: terminal.ultimo_numero_remision || 0,
+            ultimo_numero_ajuste: terminal.ultimo_numero_ajuste || 0,
             estado: terminal.estado !== undefined ? terminal.estado : true
         };
 
@@ -212,6 +223,7 @@ export class TerminalComponent implements OnInit {
         this.separarNumero(terminal.ultimo_numero_factura || 0, 'factura');
         this.separarNumero(terminal.ultimo_numero_nota_credito || 0, 'notaCredito');
         this.separarNumero(terminal.ultimo_numero_remision || 0, 'remision');
+        this.separarNumero(terminal.ultimo_numero_ajuste || 0, 'ajuste');
 
         this.showForm = true;
     }
@@ -223,7 +235,7 @@ export class TerminalComponent implements OnInit {
     }
 
     // Separar número en 3 partes: establecimiento-puntoExpedicion-secuencia
-    separarNumero(numero: number, tipo: 'factura' | 'notaCredito' | 'remision') {
+    separarNumero(numero: number, tipo: 'factura' | 'notaCredito' | 'remision' | 'ajuste') {
         const numStr = numero.toString().padStart(13, '0');
         const establecimiento = numStr.substring(0, 3);
         const puntoExpedicion = numStr.substring(3, 6);
@@ -245,11 +257,16 @@ export class TerminalComponent implements OnInit {
                 this.remisionPuntoExpedicion = puntoExpedicion;
                 this.remisionSecuencia = secuencia;
                 break;
+            case 'ajuste':
+                this.ajusteEstablecimiento = establecimiento;
+                this.ajustePuntoExpedicion = puntoExpedicion;
+                this.ajusteSecuencia = secuencia;
+                break;
         }
     }
 
     // Unir los 3 campos en un solo número
-    unirNumero(tipo: 'factura' | 'notaCredito' | 'remision'): number {
+    unirNumero(tipo: 'factura' | 'notaCredito' | 'remision' | 'ajuste'): number {
         let establecimiento: string;
         let puntoExpedicion: string;
         let secuencia: string;
@@ -269,6 +286,11 @@ export class TerminalComponent implements OnInit {
                 establecimiento = this.remisionEstablecimiento.padStart(3, '0');
                 puntoExpedicion = this.remisionPuntoExpedicion.padStart(3, '0');
                 secuencia = this.remisionSecuencia.padStart(7, '0');
+                break;
+            case 'ajuste':
+                establecimiento = this.ajusteEstablecimiento.padStart(3, '0');
+                puntoExpedicion = this.ajustePuntoExpedicion.padStart(3, '0');
+                secuencia = this.ajusteSecuencia.padStart(7, '0');
                 break;
         }
 
@@ -277,7 +299,7 @@ export class TerminalComponent implements OnInit {
     }
 
     // Obtener preview formateado
-    getPreview(tipo: 'factura' | 'notaCredito' | 'remision'): string {
+    getPreview(tipo: 'factura' | 'notaCredito' | 'remision' | 'ajuste'): string {
         let establecimiento: string;
         let puntoExpedicion: string;
         let secuencia: string;
@@ -297,6 +319,11 @@ export class TerminalComponent implements OnInit {
                 establecimiento = this.remisionEstablecimiento.padStart(3, '0');
                 puntoExpedicion = this.remisionPuntoExpedicion.padStart(3, '0');
                 secuencia = this.remisionSecuencia.padStart(7, '0');
+                break;
+            case 'ajuste':
+                establecimiento = this.ajusteEstablecimiento.padStart(3, '0');
+                puntoExpedicion = this.ajustePuntoExpedicion.padStart(3, '0');
+                secuencia = this.ajusteSecuencia.padStart(7, '0');
                 break;
         }
 
@@ -311,7 +338,7 @@ export class TerminalComponent implements OnInit {
     }
 
     // Actualizar formData cuando cambian los campos
-    onNumeroChange(tipo: 'factura' | 'notaCredito' | 'remision') {
+    onNumeroChange(tipo: 'factura' | 'notaCredito' | 'remision' | 'ajuste') {
         const numero = this.unirNumero(tipo);
         switch (tipo) {
             case 'factura':
@@ -322,6 +349,9 @@ export class TerminalComponent implements OnInit {
                 break;
             case 'remision':
                 this.formData.ultimo_numero_remision = numero;
+                break;
+            case 'ajuste':
+                this.formData.ultimo_numero_ajuste = numero;
                 break;
         }
     }
@@ -341,6 +371,7 @@ export class TerminalComponent implements OnInit {
         this.formData.ultimo_numero_factura = this.unirNumero('factura');
         this.formData.ultimo_numero_nota_credito = this.unirNumero('notaCredito');
         this.formData.ultimo_numero_remision = this.unirNumero('remision');
+        this.formData.ultimo_numero_ajuste = this.unirNumero('ajuste');
 
         if (this.isEditing && this.currentTerminalId) {
             this.terminalService.update(this.currentTerminalId, this.formData).subscribe({

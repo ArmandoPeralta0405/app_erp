@@ -31,6 +31,7 @@ import { MotivoAjusteInventarioComponent } from './components/main/inventarios/m
 import { TipoTransaccionComponent } from './components/main/sistemas/administracion/tipo-transaccion/tipo-transaccion.component';
 import { ConfiguracionSistemaComponent } from './components/main/sistemas/administracion/configuracion-sistema/configuracion-sistema.component';
 import { TerminalComponent } from './components/main/sistemas/administracion/terminal/terminal.component';
+import { AjusteInventarioComponent } from './components/main/inventarios/transaccionales/ajuste-inventario/ajuste-inventario.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -70,6 +71,7 @@ export const routes: Routes = [
             { path: 'finanzas/mantenimientos/clientes', component: ClienteComponent },
             { path: 'finanzas/mantenimientos/proveedores', component: ProveedorComponent },
             { path: 'inventarios/mantenimientos/motivos-ajustes', component: MotivoAjusteInventarioComponent },
+            { path: 'inventarios/transaccionales/ajuste-inventario', component: AjusteInventarioComponent },
 
         ],
 
