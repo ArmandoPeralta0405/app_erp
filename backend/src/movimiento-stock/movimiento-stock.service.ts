@@ -3,14 +3,21 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateMovimientoStockDto, UpdateMovimientoStockDto } from './dto/movimiento-stock.dto';
 
 // Función para serializar BigInt a Number
-function serializeBigInt(obj: any): any {
+// Función para serializar BigInt a Number y manejar fechas/ciclos
+function serializeBigInt(obj: any, seen = new WeakSet()): any {
     if (obj === null || obj === undefined) return obj;
     if (typeof obj === 'bigint') return Number(obj);
-    if (Array.isArray(obj)) return obj.map(serializeBigInt);
+    if (obj instanceof Date) return obj.toISOString();
+
     if (typeof obj === 'object') {
+        if (seen.has(obj)) return null; // Evitar ciclos
+        seen.add(obj);
+
+        if (Array.isArray(obj)) return obj.map(v => serializeBigInt(v, seen));
+
         const result: any = {};
         for (const key in obj) {
-            result[key] = serializeBigInt(obj[key]);
+            result[key] = serializeBigInt(obj[key], seen);
         }
         return result;
     }
@@ -120,19 +127,19 @@ export class MovimientoStockService {
         const where: any = {};
 
         if (filters?.id_tipo_transaccion) {
-            where.id_tipo_transaccion = filters.id_tipo_transaccion;
+            where.id_tipo_transaccion = Number(filters.id_tipo_transaccion);
         }
         if (filters?.id_sucursal) {
-            where.id_sucursal = filters.id_sucursal;
+            where.id_sucursal = Number(filters.id_sucursal);
         }
         if (filters?.id_deposito) {
-            where.id_deposito = filters.id_deposito;
+            where.id_deposito = Number(filters.id_deposito);
         }
         if (filters?.id_cliente) {
-            where.id_cliente = filters.id_cliente;
+            where.id_cliente = Number(filters.id_cliente);
         }
         if (filters?.id_proveedor) {
-            where.id_proveedor = filters.id_proveedor;
+            where.id_proveedor = Number(filters.id_proveedor);
         }
         if (filters?.fecha_desde || filters?.fecha_hasta) {
             where.fecha_documento = {};
@@ -140,7 +147,11 @@ export class MovimientoStockService {
                 where.fecha_documento.gte = new Date(filters.fecha_desde);
             }
             if (filters?.fecha_hasta) {
-                where.fecha_documento.lte = new Date(filters.fecha_hasta);
+                // Ajustar hasta el final del día si es necesario, o tal cual viene
+                // Asumimos que viene YYYY-MM-DD
+                const hasta = new Date(filters.fecha_hasta);
+                hasta.setHours(23, 59, 59, 999);
+                where.fecha_documento.lte = hasta;
             }
         }
 
@@ -205,8 +216,6 @@ export class MovimientoStockService {
                 cliente: true,
                 proveedor: true,
                 motivo_ajuste_inventario: true,
-                movimiento_stock: true, // Documento padre
-                other_movimiento_stock: true, // Documentos hijos
             },
         });
 

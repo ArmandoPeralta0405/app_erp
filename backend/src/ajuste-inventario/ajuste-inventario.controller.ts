@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, ParseIntPipe, Query } from '@nestjs/common';
 import { AjusteInventarioService } from './ajuste-inventario.service';
 import { CreateAjusteInventarioDto } from './dto/create-ajuste-inventario.dto';
 
@@ -12,8 +12,8 @@ export class AjusteInventarioController {
     }
 
     @Get()
-    findAll() {
-        return this.ajusteInventarioService.findAll();
+    findAll(@Query() query: any) {
+        return this.ajusteInventarioService.findAll(query);
     }
 
     @Get(':id')

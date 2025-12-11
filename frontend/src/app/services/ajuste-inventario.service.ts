@@ -13,6 +13,7 @@ export interface DetalleAjusteInventario {
     precio_me?: number;
     importe_ml?: number;
     importe_me?: number;
+    porcentaje_iva?: number;
     articulo?: {
         id_articulo: number;
         codigo_alfanumerico: string;
@@ -70,8 +71,16 @@ export class AjusteInventarioService {
 
     constructor(private http: HttpClient) { }
 
-    getAll(): Observable<AjusteInventario[]> {
-        return this.http.get<AjusteInventario[]>(this.apiUrl);
+    getAll(filters?: any): Observable<AjusteInventario[]> {
+        let params = new HttpParams();
+        if (filters) {
+            Object.keys(filters).forEach(key => {
+                if (filters[key] !== null && filters[key] !== undefined && filters[key] !== '') {
+                    params = params.append(key, filters[key]);
+                }
+            });
+        }
+        return this.http.get<AjusteInventario[]>(this.apiUrl, { params });
     }
 
     getOne(id: number): Observable<AjusteInventario> {

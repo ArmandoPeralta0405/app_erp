@@ -1,0 +1,228 @@
+<div class="container-fluid py-4 fade-in">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-1 fw-bold">
+                <i class="fas fa-search me-2 text-primary"></i>
+                Consulta de Ajustes
+            </h2>
+            <p class="text-muted small mb-0">Visualice y filtre los ajustes de inventario realizados</p>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white py-3">
+            <h6 class="mb-0 fw-bold text-dark"><i class="fas fa-filter me-2"></i>Filtros de Búsqueda</h6>
+        </div>
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Fecha Desde</label>
+                    <input type="date" class="form-control" [(ngModel)]="filtros.fecha_desde">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Fecha Hasta</label>
+                    <input type="date" class="form-control" [(ngModel)]="filtros.fecha_hasta">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Sucursal</label>
+                    <select class="form-select" [(ngModel)]="filtros.id_sucursal">
+                        <option value="">Todas</option>
+                        <option *ngFor="let suc of sucursales" [value]="suc.id_sucursal">
+                            {{suc.nombre}}
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button class="btn btn-primary w-100" (click)="buscar()" [disabled]="loading">
+                        <i class="fas" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-search'"></i>
+                        Buscar
+                    </button>
+                    <button class="btn btn-outline-secondary" (click)="limpiar()" title="Limpiar Filtros">
+                        <i class="fas fa-eraser"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resultados -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-sm mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Nº Comp.</th>
+                            <th>Fecha</th>
+                            <th>Sucursal</th>
+                            <th>Depósito</th>
+                            <th>Motivo</th>
+                            <th class="text-end">Total</th>
+                            <th class="text-center pe-4">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let ajuste of ajustes">
+                            <td class="ps-4 fw-medium">{{ajuste.numero_comprobante}}</td>
+                            <td>
+                                <div>{{ajuste.fecha_documento | date:'dd/MM/yyyy':'UTC'}}</div>
+                                <small class="text-muted">{{ajuste.fecha_grabacion | date:'HH:mm'}}</small>
+                            </td>
+                            <td>{{ajuste.sucursal?.nombre}}</td>
+                            <td>{{ajuste.deposito?.nombre}}</td>
+                            <td>
+                                <span
+                                    class="badge bg-secondary text-white">{{ajuste.motivo_ajuste_inventario?.nombre}}</span>
+                            </td>
+                            <td class="text-end fw-bold">{{ajuste.total_ml | number:'1.0-0'}}</td>
+                            <td class="text-center pe-4">
+                                <button class="btn btn-sm btn-outline-primary" (click)="verDetalle(ajuste)"
+                                    title="Ver Detalle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr *ngIf="ajustes.length === 0 && !loading">
+                            <td colspan="7" class="text-center py-5">
+                                <i class="fas fa-box-open fa-3x mb-3 text-muted opacity-50"></i>
+                                <p class="mb-0 text-muted">No se encontraron resultados</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Footer de resultados (opcional para totales o paginación futura) -->
+        <div class="card-footer bg-white border-top py-2" *ngIf="ajustes.length > 0">
+            <small class="text-muted">Mostrando {{ajustes.length}} registros</small>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Detalle -->
+<!-- Nota: Usamos clases de bootstrap modal + style.display para simular apertura sin JS de Bootstrap -->
+<div class="modal fade" [class.show]="ajusteSeleccionado" [style.display]="ajusteSeleccionado ? 'block' : 'none'"
+    tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content shadow-lg" *ngIf="ajusteSeleccionado">
+            <div class="modal-header">
+                <h5 class="modal-title fs-5">
+                    <i class="fas fa-file-invoice me-2"></i>
+                    Ajuste Nº {{ajusteSeleccionado.numero_comprobante}}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" (click)="cerrarDetalle()"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Info Principal -->
+                <div class="card border mb-4 bg-light">
+                    <div class="card-body py-3">
+                        <div class="row g-3">
+                            <div class="col-md-3 col-6">
+                                <span class="detail-label">Fecha</span>
+                                <span class="detail-value">
+                                    {{ajusteSeleccionado.fecha_documento | date:'dd/MM/yyyy':'UTC'}}
+                                    <span class="text-muted ms-1">{{ajusteSeleccionado.fecha_grabacion |
+                                        date:'HH:mm'}}</span>
+                                </span>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <span class="detail-label">Sucursal</span>
+                                <span class="detail-value">{{ajusteSeleccionado.sucursal?.nombre}}</span>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <span class="detail-label">Depósito</span>
+                                <span class="detail-value">{{ajusteSeleccionado.deposito?.nombre}}</span>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <span class="detail-label">Usuario</span>
+                                <span class="detail-value">{{ajusteSeleccionado.usuario?.alias}}</span>
+                            </div>
+                            <!-- Row 2 -->
+                            <div class="col-md-3 col-6">
+                                <span class="detail-label">Moneda</span>
+                                <span class="detail-value">{{ajusteSeleccionado.moneda?.nombre}}
+                                    ({{ajusteSeleccionado.moneda?.simbolo}})</span>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <span class="detail-label">Cotización</span>
+                                <span class="detail-value">{{ajusteSeleccionado.tasa_cambio | number:'1.0-2'}}</span>
+                            </div>
+                            <div class="col-md-6 col-12">
+                                <!-- Spacer or Type -->
+                                <span class="detail-label">Tipo Transacción</span>
+                                <span class="detail-value">{{ajusteSeleccionado.tipo_transaccion?.nombre}}</span>
+                            </div>
+
+                            <div class="col-12">
+                                <span class="detail-label">Observación</span>
+                                <div class="p-2 bg-white border rounded small text-secondary">
+                                    {{ajusteSeleccionado.observacion || 'Sin observaciones'}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grilla Items -->
+                <h6 class="fw-bold mb-3 text-dark border-bottom pb-2">Items del Ajuste</h6>
+
+                <div *ngIf="loadingDetails" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="text-muted mt-2 small">Cargando detalles...</p>
+                </div>
+
+                <div class="table-responsive border rounded" *ngIf="!loadingDetails">
+                    <table class="table table-sm table-striped mb-0 table-detail">
+                        <thead class="bg-dark text-white">
+                            <tr>
+                                <th class="ps-3 py-2">#</th>
+                                <th class="py-2">Código</th>
+                                <th class="py-2">Artículo</th>
+                                <th class="py-2 text-center">IVA</th>
+                                <th class="py-2 text-end">Cant.</th>
+                                <th class="py-2 text-end">Costo</th>
+                                <th class="py-2 text-end pe-3">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of ajusteSeleccionado.movimiento_stock_detalle">
+                                <td class="ps-3 text-muted small">{{item.numero_item}}</td>
+                                <td class="small font-monospace">{{item.articulo?.codigo_alfanumerico}}</td>
+                                <td class="fw-medium">{{item.articulo?.nombre}}</td>
+                                <td class="text-center small">
+                                    <span *ngIf="item.porcentaje_iva"
+                                        class="badge bg-light text-dark border">{{item.porcentaje_iva}}%</span>
+                                    <span *ngIf="!item.porcentaje_iva" class="text-muted">-</span>
+                                </td>
+                                <td class="text-end font-monospace">{{item.cantidad | number:'1.0-2'}}</td>
+                                <td class="text-end font-monospace">{{item.costo_ml | number:'1.' +
+                                    (ajusteSeleccionado.moneda?.cantidad_decimal || 0) + '-' +
+                                    (ajusteSeleccionado.moneda?.cantidad_decimal || 0)}}</td>
+                                <td class="text-end pe-3 fw-bold font-monospace">{{item.importe_ml | number:'1.' +
+                                    (ajusteSeleccionado.moneda?.cantidad_decimal || 0) + '-' +
+                                    (ajusteSeleccionado.moneda?.cantidad_decimal || 0)}}
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot class="bg-light">
+                            <tr>
+                                <td colspan="6" class="text-end fw-bold py-2">Total General:</td>
+                                <td class="text-end fw-bold py-2 pe-3 text-primary">{{ajusteSeleccionado.total_ml |
+                                    number:'1.' + (ajusteSeleccionado.moneda?.cantidad_decimal || 0) + '-' +
+                                    (ajusteSeleccionado.moneda?.cantidad_decimal || 0)}}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary btn-sm" (click)="cerrarDetalle()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-backdrop fade show" *ngIf="ajusteSeleccionado"></div>
