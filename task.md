@@ -1,0 +1,27 @@
+# Tareas: Mejoras en Ajuste de Inventario (Transaccional)
+
+- [x] **Análisis**
+    - [x] Revisar estructura actual del componente `ajuste-inventario`.
+- [ ] **Funcionalidad Transaccional**
+    - [x] **Confirmación**: Agregar diálogo SweetAlert antes de guardar.
+    - [x] **Corrección UI**: Solucionar carga inicial de depósitos (dropdown vacío).
+    - [x] **Validación Moneda**: Validar cotización si moneda != 1.
+    - [x] **Formatos Numéricos**:
+        - [x] Respetar decimales de moneda.
+        - [x] Máscara a Cotización.
+    - [ ] **Navegación Teclado**:
+        - [x] Foco inicial en Sucursal al dar Nuevo.
+        - [x] Enter salta al siguiente campo.
+        - [x] Seleccionar texto al recibir foco (Cant/Costo).
+        - [x] Enter en Costo ejecuta Agregar directamente.
+        - [ ] Fix: Refocus Artículo tras agregar.
+    - [ ] **Búsqueda Artículos**:
+- [ ] **Búsqueda Artículos**:
+        - [ ] Reemplazar Select por Input (Scanner ready).
+        - [ ] Implementar lógica de búsqueda multi-criterio.
+- [x] **Anulación de Ajustes**
+    - [x] Implementar Backend DELETE.
+    - [x] Crear Componente AnulacionAjusteInventario.
+    - [x] Configurar Rutas.
+- [ ] **Verificación**
+    - [ ] Probar flujo completo de creación.

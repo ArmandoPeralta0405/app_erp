@@ -119,10 +119,12 @@ export class MovimientoStockService {
         id_tipo_transaccion?: number;
         id_sucursal?: number;
         id_deposito?: number;
+        id_moneda?: number;
         fecha_desde?: string;
         fecha_hasta?: string;
         id_cliente?: number;
         id_proveedor?: number;
+        includeDetails?: boolean;
     }) {
         const where: any = {};
 
@@ -134,6 +136,9 @@ export class MovimientoStockService {
         }
         if (filters?.id_deposito) {
             where.id_deposito = Number(filters.id_deposito);
+        }
+        if (filters?.id_moneda) {
+            where.id_moneda = Number(filters.id_moneda);
         }
         if (filters?.id_cliente) {
             where.id_cliente = Number(filters.id_cliente);
@@ -155,25 +160,41 @@ export class MovimientoStockService {
             }
         }
 
-        const result = await this.prisma.movimiento_stock.findMany({
-            where,
-            include: {
-                tipo_transaccion: true,
-                sucursal: true,
-                deposito: true,
-                usuario: {
-                    select: {
-                        id_usuario: true,
-                        nombre: true,
-                        apellido: true,
-                        alias: true,
+        const includeObj: any = {
+            tipo_transaccion: true,
+            sucursal: true,
+            deposito: true,
+            usuario: {
+                select: {
+                    id_usuario: true,
+                    nombre: true,
+                    apellido: true,
+                    alias: true,
+                },
+            },
+            moneda: true,
+            cliente: true,
+            proveedor: true,
+            motivo_ajuste_inventario: true,
+        };
+
+        if (filters?.includeDetails) {
+            includeObj.movimiento_stock_detalle = {
+                include: {
+                    articulo: {
+                        select: {
+                            id_articulo: true,
+                            codigo_alfanumerico: true,
+                            nombre: true,
+                        },
                     },
                 },
-                moneda: true,
-                cliente: true,
-                proveedor: true,
-                motivo_ajuste_inventario: true,
-            },
+            };
+        }
+
+        const result = await this.prisma.movimiento_stock.findMany({
+            where,
+            include: includeObj,
             orderBy: {
                 fecha_grabacion: 'desc',
             },

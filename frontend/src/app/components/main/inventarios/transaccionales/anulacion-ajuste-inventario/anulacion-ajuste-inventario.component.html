@@ -1,0 +1,112 @@
+<div class="container-fluid py-2 fade-in">
+    <!-- Header -->
+    <div class="row mb-2">
+        <div class="col-12">
+            <h2 class="mb-1 fw-bold text-danger">
+                <i class="fas fa-trash-alt me-2"></i>
+                Anulación de Ajustes
+            </h2>
+            <p class="text-muted small mb-0">Busque y elimine definitivamente ajustes de inventario mal generados.</p>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card shadow-sm border-0 mb-2">
+        <div class="card-header bg-white py-2">
+            <h6 class="mb-0 fw-bold text-dark"><i class="fas fa-filter me-2"></i>Filtros de Búsqueda</h6>
+        </div>
+        <div class="card-body p-2">
+            <div class="row g-2">
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold mb-1">Fecha Desde</label>
+                    <input type="date" class="form-control form-control-sm" [(ngModel)]="filtros.fecha_desde">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold mb-1">Fecha Hasta</label>
+                    <input type="date" class="form-control form-control-sm" [(ngModel)]="filtros.fecha_hasta">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold mb-1">Sucursal</label>
+                    <select class="form-select form-select-sm" [(ngModel)]="filtros.id_sucursal">
+                        <option value="">Todas</option>
+                        <option *ngFor="let suc of sucursales" [value]="suc.id_sucursal">{{suc.nombre}}</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold mb-1">Moneda</label>
+                    <select class="form-select form-select-sm" [(ngModel)]="filtros.id_moneda">
+                        <option value="">Todas</option>
+                        <option *ngFor="let m of monedas" [value]="m.id_moneda">{{m.nombre}}</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold mb-1 d-block" style="visibility: hidden;">Spacer</label>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary btn-sm w-100" (click)="buscar()" [disabled]="loading">
+                            <i class="fas" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-search'"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" (click)="limpiar()" title="Limpiar Filtros">
+                            <i class="fas fa-eraser"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resultados -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-sm mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Nº Comp.</th>
+                            <th>Fecha</th>
+                            <th>Sucursal</th>
+                            <th>Depósito</th>
+                            <th>Usuario</th>
+                            <th>Motivo</th>
+                            <th class="text-end">Total (ML)</th>
+                            <th class="text-center pe-4">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let ajuste of ajustes">
+                            <td class="ps-4 fw-medium">{{ajuste.numero_comprobante}}</td>
+                            <td>
+                                <div>{{ajuste.fecha_documento | date:'dd/MM/yyyy':'UTC'}}</div>
+                                <small class="text-muted">{{ajuste.fecha_grabacion | date:'HH:mm'}}</small>
+                            </td>
+                            <td>{{ajuste.sucursal?.nombre}}</td>
+                            <td>{{ajuste.deposito?.nombre}}</td>
+                            <td>{{ajuste.usuario?.alias}}</td>
+                            <td>
+                                <span
+                                    class="badge bg-secondary text-white">{{ajuste.motivo_ajuste_inventario?.nombre}}</span>
+                            </td>
+                            <td class="text-end fw-bold">
+                                {{ajuste.total_ml | number:'1.0-0'}}
+                            </td>
+                            <td class="text-center pe-4">
+                                <button class="btn btn-sm btn-outline-danger" (click)="eliminar(ajuste)"
+                                    title="Eliminar Definitivamente">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr *ngIf="ajustes.length === 0 && !loading">
+                            <td colspan="8" class="text-center py-5">
+                                <i class="fas fa-box-open fa-3x mb-3 text-muted opacity-50"></i>
+                                <p class="mb-0 text-muted">No se encontraron resultados para anular</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top py-2" *ngIf="ajustes.length > 0">
+            <small class="text-muted">Mostrando {{ajustes.length}} registros</small>
+        </div>
+    </div>
+</div>

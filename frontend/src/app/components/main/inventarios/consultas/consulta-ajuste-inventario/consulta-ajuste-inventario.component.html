@@ -1,4 +1,4 @@
-<div class="container-fluid py-4 fade-in">
+<div class="container-fluid py-2 fade-in">
     <!-- Header -->
     <div class="row mb-4">
         <div class="col-12">
@@ -11,39 +11,63 @@
     </div>
 
     <!-- Filtros -->
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-white py-3">
+    <div class="card shadow-sm border-0 mb-2">
+        <div class="card-header bg-white py-2">
             <h6 class="mb-0 fw-bold text-dark"><i class="fas fa-filter me-2"></i>Filtros de Búsqueda</h6>
         </div>
-        <div class="card-body">
-            <div class="row g-3 align-items-end">
-                <div class="col-md-3">
-                    <label class="form-label">Fecha Desde</label>
-                    <input type="date" class="form-control" [(ngModel)]="filtros.fecha_desde">
+        <div class="card-body p-2">
+            <div class="row g-2">
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold mb-1">Fecha Desde</label>
+                    <input type="date" class="form-control form-control-sm" [(ngModel)]="filtros.fecha_desde">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold mb-1">Fecha Hasta</label>
+                    <input type="date" class="form-control form-control-sm" [(ngModel)]="filtros.fecha_hasta">
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Fecha Hasta</label>
-                    <input type="date" class="form-control" [(ngModel)]="filtros.fecha_hasta">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Sucursal</label>
-                    <select class="form-select" [(ngModel)]="filtros.id_sucursal">
+                    <label class="form-label small fw-bold mb-1">Sucursal</label>
+                    <select class="form-select form-select-sm" [(ngModel)]="filtros.id_sucursal">
                         <option value="">Todas</option>
-                        <option *ngFor="let suc of sucursales" [value]="suc.id_sucursal">
-                            {{suc.nombre}}
-                        </option>
+                        <option *ngFor="let suc of sucursales" [value]="suc.id_sucursal">{{suc.nombre}}</option>
                     </select>
                 </div>
-                <div class="col-md-3 d-flex gap-2">
-                    <button class="btn btn-primary w-100" (click)="buscar()" [disabled]="loading">
-                        <i class="fas" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-search'"></i>
-                        Buscar
-                    </button>
-                    <button class="btn btn-outline-secondary" (click)="limpiar()" title="Limpiar Filtros">
-                        <i class="fas fa-eraser"></i>
-                    </button>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold mb-1">Moneda</label>
+                    <select class="form-select form-select-sm" [(ngModel)]="filtros.id_moneda">
+                        <option value="">Todas</option>
+                        <option *ngFor="let m of monedas" [value]="m.id_moneda">{{m.nombre}}</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold mb-1 d-block" style="visibility: hidden;">Spacer</label>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary btn-sm w-100" (click)="buscar()" [disabled]="loading">
+                            <i class="fas" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-search'"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" (click)="limpiar()" title="Limpiar Filtros">
+                            <i class="fas fa-eraser"></i>
+                        </button>
+                        <button class="btn btn-secondary btn-sm" (click)="imprimir()" [disabled]="loading"
+                            title="Imprimir Listado">
+                            <i class="fas fa-print"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Toggle Moneda y Detalle -->
+    <div class="d-flex justify-content-end mb-2">
+        <div class="form-check form-switch me-3">
+            <input class="form-check-input" type="checkbox" id="chkDetallado" [(ngModel)]="filtros.detallado">
+            <label class="form-check-label small fw-bold text-muted" for="chkDetallado">Reporte Detallado</label>
+        </div>
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="chkMoneda" [(ngModel)]="mostrarMonedaExtranjera">
+            <label class="form-check-label small fw-bold text-muted" for="chkMoneda">Visualizar en Moneda
+                Extranjera</label>
         </div>
     </div>
 
@@ -59,7 +83,7 @@
                             <th>Sucursal</th>
                             <th>Depósito</th>
                             <th>Motivo</th>
-                            <th class="text-end">Total</th>
+                            <th class="text-end">Total {{ mostrarMonedaExtranjera ? '(ME)' : '(ML)' }}</th>
                             <th class="text-center pe-4">Acciones</th>
                         </tr>
                     </thead>
@@ -76,7 +100,11 @@
                                 <span
                                     class="badge bg-secondary text-white">{{ajuste.motivo_ajuste_inventario?.nombre}}</span>
                             </td>
-                            <td class="text-end fw-bold">{{ajuste.total_ml | number:'1.0-0'}}</td>
+                            <td class="text-end fw-bold">
+                                <span *ngIf="!mostrarMonedaExtranjera">{{ajuste.total_ml | number:'1.0-0'}}</span>
+                                <span *ngIf="mostrarMonedaExtranjera" class="text-success">{{ajuste.total_me |
+                                    number:'1.2-2'}}</span>
+                            </td>
                             <td class="text-center pe-4">
                                 <button class="btn btn-sm btn-outline-primary" (click)="verDetalle(ajuste)"
                                     title="Ver Detalle">
@@ -184,8 +212,9 @@
                                 <th class="py-2">Artículo</th>
                                 <th class="py-2 text-center">IVA</th>
                                 <th class="py-2 text-end">Cant.</th>
-                                <th class="py-2 text-end">Costo</th>
-                                <th class="py-2 text-end pe-3">Subtotal</th>
+                                <th class="py-2 text-end">Costo {{ mostrarMonedaExtranjera ? '(ME)' : '(ML)' }}</th>
+                                <th class="py-2 text-end pe-3">Subtotal {{ mostrarMonedaExtranjera ? '(ME)' : '(ML)' }}
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -199,21 +228,28 @@
                                     <span *ngIf="!item.porcentaje_iva" class="text-muted">-</span>
                                 </td>
                                 <td class="text-end font-monospace">{{item.cantidad | number:'1.0-2'}}</td>
-                                <td class="text-end font-monospace">{{item.costo_ml | number:'1.' +
-                                    (ajusteSeleccionado.moneda?.cantidad_decimal || 0) + '-' +
-                                    (ajusteSeleccionado.moneda?.cantidad_decimal || 0)}}</td>
-                                <td class="text-end pe-3 fw-bold font-monospace">{{item.importe_ml | number:'1.' +
-                                    (ajusteSeleccionado.moneda?.cantidad_decimal || 0) + '-' +
-                                    (ajusteSeleccionado.moneda?.cantidad_decimal || 0)}}
+                                <td class="text-end font-monospace">
+                                    <span *ngIf="!mostrarMonedaExtranjera">{{item.costo_ml | number:'1.0-0'}}</span>
+                                    <span *ngIf="mostrarMonedaExtranjera" class="text-success">{{item.costo_me |
+                                        number:'1.2-2'}}</span>
+                                </td>
+                                <td class="text-end pe-3 fw-bold font-monospace">
+                                    <span *ngIf="!mostrarMonedaExtranjera">{{item.importe_ml | number:'1.0-0'}}</span>
+                                    <span *ngIf="mostrarMonedaExtranjera" class="text-success">{{item.importe_me |
+                                        number:'1.2-2'}}</span>
                                 </td>
                             </tr>
                         </tbody>
                         <tfoot class="bg-light">
                             <tr>
                                 <td colspan="6" class="text-end fw-bold py-2">Total General:</td>
-                                <td class="text-end fw-bold py-2 pe-3 text-primary">{{ajusteSeleccionado.total_ml |
-                                    number:'1.' + (ajusteSeleccionado.moneda?.cantidad_decimal || 0) + '-' +
-                                    (ajusteSeleccionado.moneda?.cantidad_decimal || 0)}}</td>
+                                <td class="text-end fw-bold py-2 pe-3 text-primary">
+                                    <span *ngIf="!mostrarMonedaExtranjera">{{ajusteSeleccionado.total_ml |
+                                        number:'1.0-0'}}</span>
+                                    <span *ngIf="mostrarMonedaExtranjera"
+                                        class="text-success">{{ajusteSeleccionado.total_me
+                                        | number:'1.2-2'}}</span>
+                                </td>
                             </tr>
                         </tfoot>
                     </table>

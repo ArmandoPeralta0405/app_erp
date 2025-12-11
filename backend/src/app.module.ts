@@ -37,6 +37,7 @@ import { TerminalModule } from './terminal/terminal.module';
 import { UsuarioTerminalModule } from './usuario_terminal/usuario_terminal.module';
 import { MovimientoStockModule } from './movimiento-stock/movimiento-stock.module';
 import { AjusteInventarioModule } from './ajuste-inventario/ajuste-inventario.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { AjusteInventarioModule } from './ajuste-inventario/ajuste-inventario.mo
     UsuarioTerminalModule,
     MovimientoStockModule,
     AjusteInventarioModule,
+    DashboardModule,
   ],
 
   controllers: [AppController],

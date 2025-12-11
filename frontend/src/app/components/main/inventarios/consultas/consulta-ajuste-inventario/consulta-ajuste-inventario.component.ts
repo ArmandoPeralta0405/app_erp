@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AjusteInventarioService, AjusteInventario } from '../../../../../services/ajuste-inventario.service';
 import { SucursalService } from '../../../../../services/sucursal.service';
+import { MonedaService } from '../../../../../services/moneda.service';
 import Swal from 'sweetalert2';
 import { finalize } from 'rxjs/operators';
 
@@ -19,12 +20,16 @@ export class ConsultaAjusteInventarioComponent implements OnInit {
     filtros = {
         fecha_desde: '',
         fecha_hasta: '',
-        id_sucursal: ''
+        id_sucursal: '',
+        id_moneda: '', // Filter by currency
+        detallado: false
     };
 
     // Datos
     ajustes: AjusteInventario[] = [];
     sucursales: any[] = [];
+    monedas: any[] = [];
+    mostrarMonedaExtranjera = false; // Toggle display
     loading = false;
 
     // VerDetalle logic is fine already.
@@ -34,6 +39,7 @@ export class ConsultaAjusteInventarioComponent implements OnInit {
     constructor(
         private ajusteService: AjusteInventarioService,
         private sucursalService: SucursalService,
+        private monedaService: MonedaService,
         private cd: ChangeDetectorRef
     ) { }
 
@@ -52,13 +58,24 @@ export class ConsultaAjusteInventarioComponent implements OnInit {
     }
 
     cargarCatalogos() {
-        this.sucursalService.getAll().subscribe(data => this.sucursales = data);
+        this.sucursalService.getAll().subscribe(data => {
+            this.sucursales = data;
+            this.cd.detectChanges();
+        });
+        this.monedaService.getAll().subscribe(data => {
+            this.monedas = data;
+            this.cd.detectChanges();
+        });
     }
 
     buscar() {
         this.loading = true;
+        console.log('Buscando con filtros:', this.filtros);
         this.ajusteService.getAll(this.filtros)
-            .pipe(finalize(() => this.loading = false))
+            .pipe(finalize(() => {
+                this.loading = false;
+                this.cd.detectChanges();
+            }))
             .subscribe({
                 next: (data) => {
                     this.ajustes = data;
@@ -73,10 +90,12 @@ export class ConsultaAjusteInventarioComponent implements OnInit {
                             timer: 3000
                         });
                     }
+                    this.cd.detectChanges();
                 },
                 error: (err) => {
-                    console.error(err);
+                    console.error('Error buscando ajustes:', err);
                     Swal.fire('Error', 'No se pudieron cargar los ajustes', 'error');
+                    this.cd.detectChanges();
                 }
             });
     }
@@ -87,7 +106,9 @@ export class ConsultaAjusteInventarioComponent implements OnInit {
         this.filtros = {
             fecha_desde: firstDay.toISOString().split('T')[0],
             fecha_hasta: today.toISOString().split('T')[0],
-            id_sucursal: ''
+            id_sucursal: '',
+            id_moneda: '',
+            detallado: false
         };
         this.buscar();
     }
@@ -115,6 +136,27 @@ export class ConsultaAjusteInventarioComponent implements OnInit {
                 error: (err) => {
                     console.error('Error al recibir detalle:', err);
                     Swal.fire('Error', 'No se pudo cargar el detalle del ajuste', 'error');
+                }
+            });
+    }
+
+    imprimir() {
+        this.loading = true;
+        this.ajusteService.imprimirListado(this.filtros)
+            .pipe(finalize(() => {
+                this.loading = false;
+                this.cd.detectChanges();
+            }))
+            .subscribe({
+                next: (blob) => {
+                    const url = window.URL.createObjectURL(blob);
+                    window.open(url, '_blank');
+                    // Idealmente liberar URL con revokeObjectURL después de un tiempo
+                    setTimeout(() => window.URL.revokeObjectURL(url), 1000 * 60);
+                },
+                error: (err) => {
+                    console.error('Error al generar PDF:', err);
+                    Swal.fire('Error', 'No se pudo generar el reporte PDF', 'error');
                 }
             });
     }

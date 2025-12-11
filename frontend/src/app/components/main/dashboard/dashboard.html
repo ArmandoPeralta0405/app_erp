@@ -1,1 +1,124 @@
-<p>dashboard works!</p>
+<div class="dashboard-container fade-in" *ngIf="!loading">
+    <!-- Header -->
+    <div class="dashboard-header mb-4">
+        <h2 class="fw-bold text-primary">
+            <i class="fas fa-chart-line me-2"></i>
+            Dashboard de Inventarios
+        </h2>
+        <p class="text-muted small mb-0">Vista general de operaciones</p>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid mb-4" *ngIf="stats">
+        <div class="kpi-card">
+            <div class="kpi-icon bg-primary">
+                <i class="fas fa-boxes"></i>
+            </div>
+            <div class="kpi-content">
+                <p class="kpi-label">Total Inventario</p>
+                <h3 class="kpi-value">{{ stats.kpis.totalInventory | number:'1.0-0' }} Gs</h3>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-icon bg-success">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div class="kpi-content">
+                <p class="kpi-label">Ajustes del Mes</p>
+                <h3 class="kpi-value">{{ stats.kpis.adjustmentsThisMonth }}</h3>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-icon bg-info">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="kpi-content">
+                <p class="kpi-label">Movimientos Hoy</p>
+                <h3 class="kpi-value">{{ stats.kpis.movementsToday }}</h3>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-icon bg-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="kpi-content">
+                <p class="kpi-label">Stock Crítico</p>
+                <h3 class="kpi-value">{{ stats.kpis.criticalStock }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Section -->
+    <div class="card shadow-sm border-0 mb-4" *ngIf="stats">
+        <div class="card-body">
+            <apx-chart *ngIf="chartOptions.series" [series]="chartOptions.series!" [chart]="chartOptions.chart!"
+                [dataLabels]="chartOptions.dataLabels!" [plotOptions]="chartOptions.plotOptions!"
+                [xaxis]="chartOptions.xaxis!" [yaxis]="chartOptions.yaxis!" [title]="chartOptions.title!"
+                [colors]="chartOptions.colors!"></apx-chart>
+        </div>
+    </div>
+
+    <!-- Recent Adjustments Table -->
+    <div class="card shadow-sm border-0 mb-4" *ngIf="stats">
+        <div class="card-header bg-white py-3">
+            <h6 class="mb-0 fw-bold text-dark">
+                <i class="fas fa-history me-2"></i>
+                Últimos Ajustes
+            </h6>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-sm mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nº Comp.</th>
+                            <th>Fecha</th>
+                            <th>Sucursal</th>
+                            <th class="text-end">Total (ML)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let adj of stats.recentAdjustments">
+                            <td class="fw-medium">{{ adj.numero_comprobante }}</td>
+                            <td>{{ adj.fecha_documento | date:'dd/MM/yyyy':'UTC' }}</td>
+                            <td>{{ adj.sucursal }}</td>
+                            <td class="text-end fw-bold">{{ adj.total_ml | number:'1.0-0' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions-grid">
+        <button class="quick-action-btn btn-primary" (click)="navigateTo('/app/inventarios/transaccionales/ajuste')">
+            <i class="fas fa-plus-circle fa-2x mb-2"></i>
+            <span>Nuevo Ajuste</span>
+        </button>
+        <button class="quick-action-btn btn-info" (click)="navigateTo('/app/inventarios/consultas/ajuste')">
+            <i class="fas fa-search fa-2x mb-2"></i>
+            <span>Consultar Ajustes</span>
+        </button>
+        <button class="quick-action-btn btn-danger"
+            (click)="navigateTo('/app/inventarios/transaccionales/anulacion-ajuste')">
+            <i class="fas fa-trash-alt fa-2x mb-2"></i>
+            <span>Anular Ajuste</span>
+        </button>
+        <button class="quick-action-btn btn-secondary" (click)="navigateTo('/app/inventarios/consultas/ajuste')">
+            <i class="fas fa-file-pdf fa-2x mb-2"></i>
+            <span>Ver Reportes</span>
+        </button>
+    </div>
+</div>
+
+<!-- Loading Spinner -->
+<div class="text-center py-5" *ngIf="loading">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="text-muted mt-2">Cargando estadísticas...</p>
+</div>

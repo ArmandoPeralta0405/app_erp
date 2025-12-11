@@ -33,6 +33,7 @@ import { ConfiguracionSistemaComponent } from './components/main/sistemas/admini
 import { TerminalComponent } from './components/main/sistemas/administracion/terminal/terminal.component';
 import { AjusteInventarioComponent } from './components/main/inventarios/transaccionales/ajuste-inventario/ajuste-inventario.component';
 import { ConsultaAjusteInventarioComponent } from './components/main/inventarios/consultas/consulta-ajuste-inventario/consulta-ajuste-inventario.component';
+import { AnulacionAjusteInventarioComponent } from './components/main/inventarios/transaccionales/anulacion-ajuste-inventario/anulacion-ajuste-inventario.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -74,6 +75,7 @@ export const routes: Routes = [
             { path: 'inventarios/mantenimientos/motivos-ajustes', component: MotivoAjusteInventarioComponent },
             { path: 'inventarios/transaccionales/ajuste-inventario', component: AjusteInventarioComponent },
             { path: 'inventarios/consultas/consulta-ajustes', component: ConsultaAjusteInventarioComponent },
+            { path: 'inventarios/transaccionales/anulacion-ajuste', component: AnulacionAjusteInventarioComponent },
 
         ],
 

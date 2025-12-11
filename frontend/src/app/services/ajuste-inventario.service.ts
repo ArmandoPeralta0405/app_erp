@@ -91,9 +91,7 @@ export class AjusteInventarioService {
         return this.http.post<AjusteInventario>(this.apiUrl, data);
     }
 
-    delete(id: number): Observable<any> {
-        return this.http.delete(`${this.apiUrl}/${id}`);
-    }
+
 
     checkConfig(id_usuario: number): Observable<{ hasConfig: boolean, hasTerminal: boolean, positivo: boolean, negativo: boolean }> {
         return this.http.get<{ hasConfig: boolean, hasTerminal: boolean, positivo: boolean, negativo: boolean }>(`${this.apiUrl}/check-config/${id_usuario}`);
@@ -101,5 +99,21 @@ export class AjusteInventarioService {
 
     getNextNumber(id_usuario: number): Observable<{ numero: number }> {
         return this.http.get<{ numero: number }>(`${this.apiUrl}/next-number/${id_usuario}`);
+    }
+
+    delete(id: number): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    }
+
+    imprimirListado(filters?: any): Observable<Blob> {
+        let params = new HttpParams();
+        if (filters) {
+            Object.keys(filters).forEach(key => {
+                if (filters[key] !== null && filters[key] !== undefined && filters[key] !== '') {
+                    params = params.append(key, filters[key]);
+                }
+            });
+        }
+        return this.http.get(`${this.apiUrl}/reportes/listado`, { params, responseType: 'blob' });
     }
 }

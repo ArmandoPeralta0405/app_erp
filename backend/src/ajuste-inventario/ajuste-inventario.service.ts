@@ -3,11 +3,14 @@ import { PrismaService } from '../prisma/prisma.service';
 import { MovimientoStockService } from '../movimiento-stock/movimiento-stock.service';
 import { CreateAjusteInventarioDto } from './dto/create-ajuste-inventario.dto';
 
+import { ReportsService } from '../reports/reports.service';
+
 @Injectable()
 export class AjusteInventarioService {
     constructor(
         private prisma: PrismaService,
-        private movimientoStockService: MovimientoStockService
+        private movimientoStockService: MovimientoStockService,
+        private reportsService: ReportsService
     ) { }
 
     async create(createDto: CreateAjusteInventarioDto) {
@@ -167,6 +170,12 @@ export class AjusteInventarioService {
 
     async remove(id: number) {
         return this.movimientoStockService.remove(id);
+    }
+
+    async generateListadoPdf(query: any): Promise<Buffer> {
+        const detailed = query.detallado === 'true';
+        const data = await this.findAll({ ...query, includeDetails: detailed });
+        return this.reportsService.generateAjustesList(data, query, detailed);
     }
 
     async checkConfig(id_usuario: number) {
