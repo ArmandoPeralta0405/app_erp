@@ -34,6 +34,7 @@ import { TerminalComponent } from './components/main/sistemas/administracion/ter
 import { AjusteInventarioComponent } from './components/main/inventarios/transaccionales/ajuste-inventario/ajuste-inventario.component';
 import { ConsultaAjusteInventarioComponent } from './components/main/inventarios/consultas/consulta-ajuste-inventario/consulta-ajuste-inventario.component';
 import { AnulacionAjusteInventarioComponent } from './components/main/inventarios/transaccionales/anulacion-ajuste-inventario/anulacion-ajuste-inventario.component';
+import { ConsultaExistenciaStockComponent } from './components/main/inventarios/consultas/consulta-existencia-stock/consulta-existencia-stock.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -76,6 +77,7 @@ export const routes: Routes = [
             { path: 'inventarios/transaccionales/ajuste-inventario', component: AjusteInventarioComponent },
             { path: 'inventarios/consultas/consulta-ajustes', component: ConsultaAjusteInventarioComponent },
             { path: 'inventarios/transaccionales/anulacion-ajuste', component: AnulacionAjusteInventarioComponent },
+            { path: 'inventarios/consultas/existencias-stock', component: ConsultaExistenciaStockComponent },
 
         ],
 

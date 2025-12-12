@@ -1,0 +1,169 @@
+<div class="container-fluid fade-in">
+    <h3 class="mb-4 fw-bold text-primary">
+        <i class="fas fa-warehouse me-2"></i>
+        Consulta de Existencias de Stock
+    </h3>
+
+    <!-- Filtros -->
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Depósitos -->
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Depósitos</label>
+                    <select class="form-select" [(ngModel)]="filtros.id_deposito" multiple size="5">
+                        <option *ngFor="let dep of depositos" [value]="dep.id_deposito">
+                            {{ dep.nombre }}
+                        </option>
+                    </select>
+                    <small class="text-muted">Mantén Ctrl para seleccionar múltiples</small>
+                </div>
+
+                <!-- Artículo -->
+                <div class="col-md-4 position-relative">
+                    <label class="form-label fw-semibold">Artículo</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" [(ngModel)]="txtBusquedaArticulo"
+                            (input)="onBusquedaInput()" (keydown)="onBusquedaKeydown($event)"
+                            (blur)="mostrarSugerencias = false" placeholder="Código o nombre del artículo"
+                            autocomplete="off">
+                        <button class="btn btn-outline-secondary" type="button" (click)="buscarArticulo()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        <button class="btn btn-outline-danger" type="button" *ngIf="articuloSeleccionado"
+                            (click)="limpiarArticulo()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <!-- Sugerencias -->
+                    <ul class="dropdown-menu w-100 show shadow-sm" *ngIf="mostrarSugerencias"
+                        style="max-height: 300px; overflow-y: auto; top: 100%; z-index: 1050;">
+                        <li *ngFor="let s of sugerencias; let i = index">
+                            <button class="dropdown-item small py-1" type="button"
+                                [class.active]="i === indiceSugerencia"
+                                (mousedown)="$event.preventDefault(); seleccionarArticulo(s)">
+                                <div class="fw-bold">{{ s.codigo_alfanumerico || 'S/C' }}</div>
+                                <div class="text-truncate">{{ s.nombre }}</div>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Línea -->
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Línea</label>
+                    <select class="form-select" [(ngModel)]="filtros.id_linea">
+                        <option [ngValue]="null">Todas</option>
+                        <option *ngFor="let linea of lineas" [ngValue]="linea.id_linea">
+                            {{ linea.nombre }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Solo con stock -->
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Opciones</label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="soloConStock"
+                            [(ngModel)]="filtros.solo_con_stock">
+                        <label class="form-check-label" for="soloConStock">
+                            Solo con stock
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <button class="btn btn-primary me-2" (click)="buscar()" [disabled]="loading">
+                        <i class="fas fa-search me-1"></i>
+                        Buscar
+                    </button>
+                    <button class="btn btn-secondary" (click)="limpiar()">
+                        <i class="fas fa-eraser me-1"></i>
+                        Limpiar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Totalizadores -->
+    <div class="row mb-3" *ngIf="!loading">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-primary">
+                <div class="card-body">
+                    <h6 class="text-muted mb-1">Total Artículos</h6>
+                    <h3 class="mb-0 text-primary">{{ totalArticulos }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-success">
+                <div class="card-body">
+                    <h6 class="text-muted mb-1">Total Existencia</h6>
+                    <h3 class="mb-0 text-success">{{ totalExistencia | number:'1.0-2' }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-danger">
+                <div class="card-body">
+                    <h6 class="text-muted mb-1">Sin Stock</h6>
+                    <h3 class="mb-0 text-danger">{{ articulosSinStock }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Resultados -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive" *ngIf="!loading">
+                <table class="table table-hover table-sm">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Código</th>
+                            <th>Descripción</th>
+                            <th>Línea</th>
+                            <th>Marca</th>
+                            <th>U.M.</th>
+                            <th>Depósito</th>
+                            <th class="text-end">Existencia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of existencias">
+                            <td class="fw-medium">{{ item.codigo }}</td>
+                            <td>{{ item.descripcion }}</td>
+                            <td>{{ item.linea }}</td>
+                            <td>{{ item.marca }}</td>
+                            <td>{{ item.unidad_medida }}</td>
+                            <td>{{ item.deposito }}</td>
+                            <td class="text-end">
+                                <span [class]="item.existencia === 0 ? 'badge bg-danger' : 'fw-bold'">
+                                    {{ item.existencia | number:'1.0-2' }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr *ngIf="existencias.length === 0">
+                            <td colspan="7" class="text-center text-muted py-4">
+                                No se encontraron resultados
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div class="text-center py-5" *ngIf="loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="text-muted mt-2">Cargando existencias...</p>
+            </div>
+        </div>
+    </div>
+</div>

@@ -10,8 +10,14 @@ async function bootstrap() {
 
   // 1. Habilitar CORS para permitir peticiones desde el frontend
   app.enableCors({
-    origin: true, // Permite cualquier origen en desarrollo (incluyendo móvil)
+    origin: [
+      'http://localhost:4200',
+      'http://127.0.0.1:4200',
+      'https://superfluous-neonatally-ronin.ngrok-free.dev'
+    ],
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'],
   });
 
   // 2. Configuración del Prefijo Global (opcional, pero buena práctica)
