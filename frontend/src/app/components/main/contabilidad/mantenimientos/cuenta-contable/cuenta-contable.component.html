@@ -1,0 +1,225 @@
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4 class="mb-1 fw-bold text-dark">
+                <i class="fas fa-book text-primary me-2"></i>
+                Gestión de Cuentas Contables
+            </h4>
+            <p class="text-muted small mb-0">Administra el plan de cuentas contables del sistema</p>
+        </div>
+    </div>
+
+    <!-- Buscador y botón nuevo -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-white">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+                <input type="text" class="form-control" placeholder="Buscar por número, descripción o grupo..."
+                    [(ngModel)]="searchTerm" (input)="onSearch()">
+            </div>
+        </div>
+        <div class="col-md-6 text-end">
+            <button class="btn btn-primary" (click)="abrirFormularioNuevo()" [disabled]="!canWrite">
+                <i class="fas fa-plus me-2"></i>
+                Nueva Cuenta
+            </button>
+        </div>
+    </div>
+
+    <!-- Tabla de cuentas -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <div *ngIf="loading" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                        <p class="text-muted mt-2">Cargando cuentas contables...</p>
+                    </div>
+
+                    <div *ngIf="!loading" class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="border-0">ID</th>
+                                    <th class="border-0">Número</th>
+                                    <th class="border-0">Descripción</th>
+                                    <th class="border-0 text-center">Nivel</th>
+                                    <th class="border-0">Grupo</th>
+                                    <th class="border-0 text-center">Estado</th>
+                                    <th class="border-0 text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngIf="cuentasFiltradas.length === 0">
+                                    <td colspan="7" class="text-center text-muted py-5">
+                                        <i class="fas fa-inbox fa-3x mb-3 d-block text-muted opacity-50"></i>
+                                        <p class="mb-0">{{ searchTerm ? 'No se encontraron resultados' : 'No hay cuentas
+                                            contables registradas' }}</p>
+                                    </td>
+                                </tr>
+                                <tr *ngFor="let cuenta of cuentasPaginadas">
+                                    <td class="align-middle" data-label="ID">
+                                        <span class="badge bg-light text-dark">{{ cuenta.id_cuenta_contable }}</span>
+                                    </td>
+                                    <td class="align-middle fw-semibold" data-label="Número">
+                                        {{ cuenta.numero_cuenta }}
+                                    </td>
+                                    <td class="align-middle" data-label="Descripción">{{ cuenta.descripcion }}</td>
+                                    <td class="align-middle text-center" data-label="Nivel">
+                                        <span class="badge bg-info">Nivel {{ cuenta.nivel }}</span>
+                                    </td>
+                                    <td class="align-middle" data-label="Grupo">
+                                        <span class="badge bg-primary" *ngIf="cuenta.grupo_cuenta_contable">
+                                            {{ cuenta.grupo_cuenta_contable.codigo }} - {{
+                                            cuenta.grupo_cuenta_contable.nombre }}
+                                        </span>
+                                        <span class="text-muted" *ngIf="!cuenta.grupo_cuenta_contable">-</span>
+                                    </td>
+                                    <td class="align-middle text-center" data-label="Estado">
+                                        <span class="badge" [class.bg-success]="cuenta.estado"
+                                            [class.bg-danger]="!cuenta.estado">
+                                            {{ cuenta.estado ? 'Activo' : 'Inactivo' }}
+                                        </span>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <button class="btn btn-outline-primary"
+                                                (click)="abrirFormularioEditar(cuenta)" [disabled]="!canWrite"
+                                                title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger" (click)="eliminarCuenta(cuenta)"
+                                                [disabled]="!canDelete" title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginación -->
+                    <div *ngIf="!loading && cuentasFiltradas.length > 0" class="card-footer bg-white border-top">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <small class="text-muted">
+                                    Página {{ currentPage }} de {{ totalPages }}
+                                </small>
+                            </div>
+                            <div class="col-md-6">
+                                <nav aria-label="Paginación">
+                                    <ul class="pagination pagination-sm justify-content-md-end mb-0">
+                                        <li class="page-item" [class.disabled]="currentPage === 1">
+                                            <a class="page-link" (click)="cambiarPagina(currentPage - 1)"
+                                                href="javascript:void(0)">
+                                                <i class="fas fa-chevron-left"></i>
+                                            </a>
+                                        </li>
+                                        <li class="page-item" *ngFor="let page of pages"
+                                            [class.active]="page === currentPage">
+                                            <a class="page-link" (click)="cambiarPagina(page)"
+                                                href="javascript:void(0)">
+                                                {{ page }}
+                                            </a>
+                                        </li>
+                                        <li class="page-item" [class.disabled]="currentPage === totalPages">
+                                            <a class="page-link" (click)="cambiarPagina(currentPage + 1)"
+                                                href="javascript:void(0)">
+                                                <i class="fas fa-chevron-right"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de formulario -->
+<div class="modal" [class.show]="showForm" [style.display]="showForm ? 'block' : 'none'" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-book me-2"></i>
+                    {{ isEditing ? 'Editar Cuenta Contable' : 'Nueva Cuenta Contable' }}
+                </h5>
+                <button type="button" class="btn-close" (click)="cerrarFormulario()"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Número de Cuenta <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" [(ngModel)]="formData.numero_cuenta"
+                                name="numero_cuenta" placeholder="Ej: 123456789" maxlength="9"
+                                (blur)="formatearNumeroCuenta()" (input)="validarSoloNumeros($event)" required>
+                            <small class="text-muted">Máximo 9 dígitos numéricos. Se autocompletará con ceros.</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nivel <span class="text-danger">*</span></label>
+                            <select class="form-select" [(ngModel)]="formData.nivel" name="nivel" required>
+                                <option [value]="1">Nivel 1 - Mayor</option>
+                                <option [value]="2">Nivel 2 - Submáyor</option>
+                                <option [value]="3">Nivel 3 - Cuenta</option>
+                                <option [value]="4">Nivel 4 - Subcuenta</option>
+                                <option [value]="5">Nivel 5 - Auxiliar</option>
+                            </select>
+                            <small class="text-muted">Nivel jerárquico de la cuenta en el plan de cuentas</small>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descripción <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" [(ngModel)]="formData.descripcion" name="descripcion"
+                            placeholder="Ej: Caja, Bancos, Clientes..." maxlength="250" required>
+                        <small class="text-muted">Máximo 250 caracteres</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Grupo de Cuenta Contable <span class="text-danger">*</span></label>
+                        <select class="form-select" [(ngModel)]="formData.id_grupo_cuenta_contable"
+                            name="id_grupo_cuenta_contable" required>
+                            <option [value]="0" disabled>Seleccione un grupo...</option>
+                            <option *ngFor="let grupo of gruposCuentaContable" [value]="grupo.id_grupo_cuenta_contable">
+                                {{ grupo.codigo }} - {{ grupo.nombre }}
+                            </option>
+                        </select>
+                        <small class="text-muted">Clasificación de la cuenta (Activo, Pasivo, Ingreso, etc.)</small>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="estadoSwitch"
+                                [(ngModel)]="formData.estado" name="estado">
+                            <label class="form-check-label" for="estadoSwitch">
+                                <strong>Estado: </strong>
+                                <span [class]="formData.estado ? 'text-success' : 'text-danger'">
+                                    {{ formData.estado ? 'Activo' : 'Inactivo' }}
+                                </span>
+                            </label>
+                        </div>
+                        <small class="text-muted">Indica si la cuenta está activa o inactiva en el sistema</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="cerrarFormulario()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" (click)="guardarCuenta()">
+                    <i class="fas fa-save me-2"></i>
+                    {{ isEditing ? 'Actualizar' : 'Guardar' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-backdrop fade" [class.show]="showForm" *ngIf="showForm"></div>

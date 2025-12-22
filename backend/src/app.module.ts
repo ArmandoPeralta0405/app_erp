@@ -39,6 +39,8 @@ import { MovimientoStockModule } from './movimiento-stock/movimiento-stock.modul
 import { AjusteInventarioModule } from './ajuste-inventario/ajuste-inventario.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { ArticuloDepositoModule } from './articulo-deposito/articulo-deposito.module';
+import { GrupoCuentaContableModule } from './grupo_cuenta_contable/grupo_cuenta_contable.module';
+import { CuentaContableModule } from './cuenta_contable/cuenta_contable.module';
 
 @Module({
   imports: [
@@ -79,6 +81,8 @@ import { ArticuloDepositoModule } from './articulo-deposito/articulo-deposito.mo
     AjusteInventarioModule,
     DashboardModule,
     ArticuloDepositoModule,
+    GrupoCuentaContableModule,
+    CuentaContableModule,
   ],
 
   controllers: [AppController],

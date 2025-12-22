@@ -55,7 +55,7 @@ export class ArticuloComponent implements OnInit {
 
     // Paginación
     currentPage = 1;
-    itemsPerPage = 10;
+    itemsPerPage = 8;
     totalPages = 0;
     pages: number[] = [];
     unidadesPaginadas: Articulo[] = [];
@@ -110,12 +110,12 @@ export class ArticuloComponent implements OnInit {
                 this.articulos = data;
                 this.filtrar();
                 this.loading = false;
-                // Force view update
-                setTimeout(() => this.cdr.detectChanges(), 0);
+                this.cdr.detectChanges();
             },
             error: (err) => {
                 console.error('Error cargando artículos', err);
                 this.loading = false;
+                this.cdr.detectChanges();
                 if (err.status !== 404) {
                     Swal.fire('Error', 'No se pudieron cargar los artículos', 'error');
                 }
