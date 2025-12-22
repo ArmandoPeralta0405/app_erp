@@ -41,6 +41,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { ArticuloDepositoModule } from './articulo-deposito/articulo-deposito.module';
 import { GrupoCuentaContableModule } from './grupo_cuenta_contable/grupo_cuenta_contable.module';
 import { CuentaContableModule } from './cuenta_contable/cuenta_contable.module';
+import { ConceptoModule } from './concepto/concepto.module';
 
 @Module({
   imports: [
@@ -83,6 +84,7 @@ import { CuentaContableModule } from './cuenta_contable/cuenta_contable.module';
     ArticuloDepositoModule,
     GrupoCuentaContableModule,
     CuentaContableModule,
+    ConceptoModule,
   ],
 
   controllers: [AppController],

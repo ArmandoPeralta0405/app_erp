@@ -37,6 +37,7 @@ import { AnulacionAjusteInventarioComponent } from './components/main/inventario
 import { ConsultaExistenciaStockComponent } from './components/main/inventarios/consultas/consulta-existencia-stock/consulta-existencia-stock.component';
 import { GrupoCuentaContableComponent } from './components/main/contabilidad/mantenimientos/grupo-cuenta-contable/grupo-cuenta-contable.component';
 import { CuentaContableComponent } from './components/main/contabilidad/mantenimientos/cuenta-contable/cuenta-contable.component';
+import { ConceptoComponent } from './components/main/finanzas/mantenimientos/concepto/concepto.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -75,6 +76,7 @@ export const routes: Routes = [
             { path: 'finanzas/mantenimientos/ciudades', component: CiudadComponent },
             { path: 'finanzas/mantenimientos/clientes', component: ClienteComponent },
             { path: 'finanzas/mantenimientos/proveedores', component: ProveedorComponent },
+            { path: 'finanzas/mantenimientos/conceptos', component: ConceptoComponent },
             { path: 'inventarios/mantenimientos/motivos-ajustes', component: MotivoAjusteInventarioComponent },
             { path: 'inventarios/transaccionales/ajuste-inventario', component: AjusteInventarioComponent },
             { path: 'inventarios/consultas/consulta-ajustes', component: ConsultaAjusteInventarioComponent },

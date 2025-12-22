@@ -551,6 +551,7 @@ model cuenta_contable {
   nivel                    Int
   id_grupo_cuenta_contable Int
   estado                   Boolean?              @default(true)
+  concepto                 concepto[]
   grupo_cuenta_contable    grupo_cuenta_contable @relation(fields: [id_grupo_cuenta_contable], references: [id_grupo_cuenta_contable], onDelete: NoAction, onUpdate: NoAction, map: "fk_cuenta_contable_grupo")
 
   @@index([estado], map: "idx_cuenta_contable_estado")
@@ -570,4 +571,18 @@ model grupo_cuenta_contable {
 
   @@index([codigo], map: "idx_grupo_cuenta_codigo")
   @@index([estado], map: "idx_grupo_cuenta_estado")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model concepto {
+  id_concepto        Int             @id @default(autoincrement())
+  descripcion        String          @db.VarChar(150)
+  tipo_concepto      String          @db.Char(1)
+  id_cuenta_contable Int?
+  estado             Boolean?        @default(true)
+  cuenta_contable    cuenta_contable? @relation(fields: [id_cuenta_contable], references: [id_cuenta_contable], onDelete: NoAction, onUpdate: NoAction, map: "fk_concepto_cuenta")
+
+  @@index([id_cuenta_contable], map: "idx_concepto_cuenta")
+  @@index([estado], map: "idx_concepto_estado")
 }
